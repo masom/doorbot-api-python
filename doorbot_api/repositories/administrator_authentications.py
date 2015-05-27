@@ -4,5 +4,5 @@ from ..core.repository import Repository
 from ..models.administrator_authentication import AdministratorAuthentication
 
 
-class Accounts(Repository):
+class AdministratorAuthentications(Repository):
     __model__ = AdministratorAuthentication

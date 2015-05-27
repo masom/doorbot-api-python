@@ -8,7 +8,7 @@ from . import DeclarativeBase
 class Device(DeclarativeBase):
     __tablename__ = 'devices'
 
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     account_id = Column(Integer)
 
     name = Column(String)

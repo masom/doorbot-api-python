@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from flask import _app_ctx_stack as stack
+
 from .accounts import Accounts
 from .administrator_authentications import AdministratorAuthentications
 from .administrators import Administrators
@@ -25,23 +27,40 @@ class Repositories(object):
         people=People
     )
 
-    def __init__(self, database):
-        self._database = database
-        self._instances = dict()
-        self.account_id = 0
+    def __init__(self, app=None):
+        self.app = app
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        app.teardown_appcontext(self.teardown)
+
+    def teardown(self, app):
+        pass
 
     def __getattr__(self, attr):
 
-        klass = self.__repositories__.get(attr, False)
-        if klass is False:
+        if hasattr(self, attr):
+            return getattr(self, attr)
+
+        ctx = stack.top
+
+        if ctx is None:
             raise AttributeError()
 
-        repo = self._instances.get(attr, None)
-        if not repo:
-            repo = klass(self._database)
-            self._instances[attr] = repo
+        klass = self.__repositories__.get(attr, False)
+        if klass is False:
+            raise AttributeError('Attribute %s is not defined' % attr)
 
-        repo.set_account_scope(self.account_id)
+        if not hasattr(ctx, 'doorbot_repositories'):
+            ctx.doorbot_repositories = dict()
+
+        repo = ctx.doorbot_repositories.get(attr, None)
+        if not repo:
+            repo = klass(ctx.doorbot_database)
+            ctx.doorbot_repositories[attr] = repo
+
+        repo.set_account_scope(ctx.account_id)
         return repo
 
     def database_session(self):

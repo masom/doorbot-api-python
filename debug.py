@@ -1,4 +1,10 @@
-from flask import Flask
+# -*- coding: utf-8 -*-
 
-app = Flash(__name__)
+from werkzeug.serving import run_simple
+from doorbot_api import create_app
 
+app = create_app()
+app.debug = True
+
+run_simple('localhost', 5000, app,
+        use_reloader=True, use_debugger=True, use_evalex=True)

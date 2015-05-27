@@ -8,6 +8,7 @@ from . import DeclarativeBase
 class BridgeUser(DeclarativeBase):
     __tablename__ = 'bridge_users'
 
+    id = Column(Integer, primary_key=True)
     account_id = Column(Integer)
     person_id = Column(Integer)
     bridge_id = Column(Integer)

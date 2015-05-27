@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from ..core.service import Service
-from . import Services
-from ..models import account, authentication
 from ..security import generate_password, password_crypt
+
 
 class Accounts(Service):
 
@@ -39,13 +38,14 @@ class Accounts(Service):
 
         accounts.update(account, True)
 
-
     def delete(self, account):
         accounts = self._repositories.accounts
 
         accounts.delete(account)
 
     def _generate_host(self, requested):
+        accounts = self._repositories.accounts
+
         if requested:
             exists = accounts.first(dict(host=requested))
 

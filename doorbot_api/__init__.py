@@ -1,14 +1,28 @@
 from flask import Flask
+from .services import Services
+from .repositories import Repositories
 
-app = Flash(__name__)
 
-
-def create_app(config_filename):
+def create_app(config=None):
     app = Flask(__name__)
-    app.config.from_pyfile(config_filename)
 
-    from .routes import routes
+    if config:
+        app.config.from_pyfile(config)
 
-    app.register_blueprint(routes)
+    from .views import (accounts, api, auth)
+
+    repositories = Repositories()
+    repositories.init_app(app)
+
+    services = Services()
+    services.init_app(app)
+
+    app.doorbot_services = services
+    app.doorbot_repositories = repositories
+    app.doorbot_database = False
+
+    app.register_blueprint(accounts)
+    app.register_blueprint(api)
+    app.register_blueprint(auth)
 
     return app

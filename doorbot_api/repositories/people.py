@@ -5,4 +5,4 @@ from ..models.person import Person
 
 
 class People(Repository):
-    __model__ = People
+    __model__ = Person

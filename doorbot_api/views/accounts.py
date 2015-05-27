@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import current_app, Blueprint, jsonify, g, request
+from flask import Blueprint, jsonify, request
+from ..container import container
+
 accounts = Blueprint('accounts', __name__, url_prefix='/api/accounts')
 
 
 @accounts.route('', methods=['GET'])
 def index():
-    repositories = current_app.doorbot_repositories
+    repositories = container.repositories
 
     return jsonify(dict(accounts=repositories.accounts.all()))
 
@@ -15,5 +17,5 @@ def index():
 @accounts.route('/register', methods=['POST'])
 def register():
 
-    services = current_app.doorbot_services
-    services.accounts.register(data)
+    services = container.services
+    services.accounts.register(request.data)

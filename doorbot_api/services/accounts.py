@@ -21,9 +21,10 @@ class Accounts(Service):
 
             self._services.notifications.account_created(account, owner)
 
-            self._repositories.database_session().commit()
+            self._repositories.session.commit()
+
         except Exception as e:
-            self._repositories.database_ession().rollback()
+            self._repositories.session.rollback()
             raise e
 
         return dict(account=account, owner=owner, password=password)

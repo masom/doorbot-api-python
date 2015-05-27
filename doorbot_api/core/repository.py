@@ -7,9 +7,12 @@ class Repository(object):
     """
     __model__ = None
 
-    def __init__(self, database):
-        self._db = db
+    def __init__(self, session):
+        self._session = session
         self.account_id = 0
+
+    def set_session(self, session):
+        self._session = session
 
     def set_account_scope(self, account_id):
         self.account_id = account_id
@@ -33,17 +36,18 @@ class Repository(object):
         :param model: the model to save
         """
         self._isinstance(model)
-        self._db.session.add(model)
+        self._session.add(model)
 
         if immediate:
-            self._db.session.commit()
+            self._session.commit()
 
         return model
 
     def all(self):
         """Returns a generator containing all instances of the service's model.
         """
-        return self.__model__.query.all()
+        print(self.__model__)
+        return self._session.query(self.__model__).all()
 
     def get(self, id):
         """Returns an instance of the service's model with the specified id.
@@ -51,7 +55,7 @@ class Repository(object):
 
         :param id: the instance id
         """
-        return self.__model__.query.get(id)
+        return self._session.query(self.__model__).get(id)
 
     def find(self, **kwargs):
         """Returns a list of instances of the service's model filtered by the
@@ -59,7 +63,7 @@ class Repository(object):
 
         :param **kwargs: filter parameters
         """
-        return self.__model__.query.filter_by(**kwargs)
+        return self._session.query(self.__model__).filter_by(**kwargs)
 
     def first(self, **kwargs):
         """Returns the first instance found of the service's model filtered by
@@ -90,7 +94,7 @@ class Repository(object):
         :param immediate: Immediately delete the instance.
         """
         self._isinstance(model)
-        self._db.session.delete(model)
+        self._session.delete(model)
 
         if immediate:
-            self._db.session.commit()
+            self._session.commit()

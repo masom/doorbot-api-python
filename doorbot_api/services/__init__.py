@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .accounts import Accounts
+from .auth import Auth
 from .host_generator import HostGenerator
 from .. import repositories
 
@@ -9,6 +10,7 @@ class Services(object):
 
     __services__ = dict(
         accounts=Accounts,
+        auth=Auth,
         host_generator=HostGenerator,
     )
 

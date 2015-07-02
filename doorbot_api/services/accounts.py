@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import logging
+logger = logging.getLogger(__name__)
+
 from ..core.service import Service
 from ..security import generate_password, password_crypt
 
 
 class Accounts(Service):
 
-    def register(self, request):
+    def create(self, request):
+        session = self._repositories.session
+
         try:
             host = self._generate_host(request.account.host)
 
@@ -21,15 +26,36 @@ class Accounts(Service):
 
             self._services.notifications.account_created(account, owner)
 
-            self._repositories.session.commit()
+            session.commit()
+
+            logger.info(
+                '{module} account created'.format(module=__name__),
+                module=__name__,
+                account_id=account.id,
+                account_host=account.host,
+                person_id=auth.person_id,
+                password=password
+            )
 
         except Exception as e:
-            self._repositories.session.rollback()
-            raise e
+            logger.error(
+                '{module} creation error'.format(module=__name__),
+                error=e,
+                module=__name__
+            )
 
-        return dict(account=account, owner=owner, password=password)
+            session.rollback()
+
+            return dict(account=None, error=e)
+
+        return dict(account=account)
 
     def update(self, account, request):
+        '''
+        :param account:
+        :param request:
+        '''
+
         accounts = self._repositories.accounts
 
         account.name = request.account.name
@@ -37,12 +63,18 @@ class Accounts(Service):
         account.notifications_email_enabled = request.account.notifications_email_enabled
         account.notifications_sms_enabled = request.account.notifications_sms_enabled
 
-        accounts.update(account, True)
+        accounts.save(account, True)
 
     def delete(self, account):
         accounts = self._repositories.accounts
 
         accounts.delete(account)
+
+        logger.info(
+            '{module} account deleted'.format(module=__name__),
+            module=__name__,
+            account_id=account.id
+        )
 
     def _generate_host(self, requested):
         accounts = self._repositories.accounts
@@ -51,7 +83,12 @@ class Accounts(Service):
             exists = accounts.first(dict(host=requested))
 
             if exists:
-                # TODO response object with resolution
+                logger.warning(
+                    '{module} host is already taken'.format(module=__name__),
+                    module=__name__,
+                    host=requested
+                )
+
                 return False
 
             host = requested
@@ -59,12 +96,22 @@ class Accounts(Service):
             host = self._services.host_generator.random(10)
 
         if not host:
-            # TODO Service Unavailable
+            logger.error(
+                '{module} invalid host'.format(module=__name__),
+                requested=requested,
+                host=host,
+                module=__name__
+            )
+
             return False
 
         return host
 
     def _create_account(self, requested):
+        '''
+        :param request:
+        '''
+
         accounts = self._repositories.accounts
 
         account = accounts.new()
@@ -84,6 +131,11 @@ class Accounts(Service):
         return account
 
     def _create_account_owner(self, account, requested):
+        '''
+        :param account:
+        :param requested:
+        '''
+
         people = self._repositories.people
 
         person = people.new()
@@ -95,15 +147,18 @@ class Accounts(Service):
 
         return person
 
-
     def _create_account_owner_auth(self, owner):
+        '''
+        :param owner:
+        '''
+
         authentications = self._repositories.authentications
 
         password = generate_password(8)
 
         auth = authentications.new()
-        auth.person_id = person.id
-        auth.provider_id = authentication.PROVIDER_PASSWORD
+        auth.person_id = owner.id
+        auth.provider_id = auth.PROVIDER_PASSWORD
         auth.token = password_crypt(password)
 
         authentications.save(auth, False)

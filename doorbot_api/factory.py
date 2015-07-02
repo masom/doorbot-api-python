@@ -12,13 +12,15 @@ def create_app(config=None):
     if config:
         app.config.from_pyfile(config)
 
+    app.url_map.strict_slashes = False
+
+    db.init_app(app)
+    container.init_app(app)
+
     from .views import (accounts, api, auth)
 
-    container.init_app(app)
-    db.init_app(app)
-
-    app.register_blueprint(accounts)
     app.register_blueprint(api)
     app.register_blueprint(auth)
+    app.register_blueprint(accounts)
 
     return app

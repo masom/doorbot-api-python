@@ -1,6 +1,8 @@
-from flask import current_app, Blueprint, jsonify
+from flask import Blueprint, jsonify
+
 api = Blueprint('api', __name__)
 
-@api.route('/api/status')
+
+@api.route('/status')
 def status():
     return jsonify(dict(status="ok"))

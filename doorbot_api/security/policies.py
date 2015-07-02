@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
 
+from .roles import (ACCOUNT_OWNER, ACCOUNT_MEMBER, ACCOUNT_MANAGER)
+
 policy = dict(
-    account_delete=false,
-    account_update=false,
-    account_list=false,
-    account_view=false,
+    account_delete=False,
+    account_update=False,
+    account_list=False,
+    account_view=False,
 
-    device_create=false,
-    device_delete=false,
-    device_update=false,
-    device_list=false,
-    device_view=false,
+    device_create=False,
+    device_delete=False,
+    device_update=False,
+    device_list=False,
+    device_view=False,
 
-    door_create=false,
-    door_delete=false,
-    door_update=false,
-    door_list=false,
-    door_view=false,
+    door_create=False,
+    door_delete=False,
+    door_update=False,
+    door_list=False,
+    door_view=False,
 
-    person_create=false,
-    person_delete=false,
-    person_update=false,
-    person_list=false,
-    person_view=false,
+    person_create=False,
+    person_delete=False,
+    person_update=False,
+    person_list=False,
+    person_view=False,
 )
+
 
 class Policy:
     def __init__(self):
@@ -41,7 +44,7 @@ class AccountOwnerPolicy(Policy):
 
 
 class AdministratorPolicy(Policy):
-    def __init__(self): 
+    def __init__(self):
         for item in policy.iterkeys():
             setattr(self, item, True)
 
@@ -73,3 +76,17 @@ class MemberPolicy(Policy):
         self.door_view = True
         self.person_list = True
         self.person_view = True
+
+policies = dict(
+    ACCOUNT_OWNER=AccountOwnerPolicy,
+    ACCOUNT_MEMBER=MemberPolicy,
+    ACCOUNT_MANAGER=ManagerPolicy
+)
+
+
+def get_policy_for_person(person):
+    policy = policies.get(person.account_type, None)
+
+    if policy:
+        return policy()
+    return None

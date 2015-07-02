@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+
+ACCOUNT_MEMBER = 1
+ACCOUNT_MANAGER = 2
+ACCOUNT_OWNER = 3

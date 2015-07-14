@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..auth import (PROVIDER_PASSWORD, PROVIDER_API_TOKEN)
-from ..core import Repository
+from ..core.repository import Repository
 from ..security import generate_password
 
 

@@ -4,6 +4,7 @@ from flask import _request_ctx_stack as stack
 
 from .services import Services
 from .repositories import Repositories
+from .auth import Authorization
 from .db import db
 
 
@@ -21,6 +22,18 @@ class Container(object):
             return None
 
         ctx.doorbot_account_id = id
+
+    @property
+    def authorization(self):
+        ctx = stack.top
+
+        if ctx is None:
+            return None
+
+        if not hasattr(ctx, 'doorbot_authorization'):
+            ctx.doorbot_authorization = Authorization()
+
+        return ctx.doorbot_authorization
 
     @property
     def account(self):

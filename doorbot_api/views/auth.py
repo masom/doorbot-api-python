@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ..container import container
-from ..security.policies import policy_for_person
+from ..security.policies import get_policy_for_person
 
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
@@ -23,5 +23,5 @@ def password():
             )
         ),
         person=result.person,
-        policy=policy_for_person(result.person)
+        policy=get_policy_for_person(result.person)
     ))

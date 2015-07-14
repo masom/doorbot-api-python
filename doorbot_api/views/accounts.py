@@ -3,6 +3,9 @@
 
 from flask import Blueprint, jsonify, request
 from ..container import container
+from ..middleswares import (
+    m, auth_admin, auth_gatekeeper, auth_owner, auth_secured
+)
 
 accounts = Blueprint('accounts', __name__, url_prefix='/accounts')
 
@@ -26,7 +29,6 @@ class PublicAccount(object):
         )
 
 
-@accounts.route('', methods=['GET'])
 def index():
     repositories = container.repositories
 
@@ -40,7 +42,6 @@ def index():
     ))
 
 
-@accounts.route('/register', methods=['POST'])
 def create():
 
     services = container.services
@@ -54,8 +55,7 @@ def create():
     ))
 
 
-@accounts.route('/<int:id>', methods=['GET'])
-def get(id):
+def view(id):
     repositories = container.repositories
 
     return jsonify(dict(
@@ -63,7 +63,6 @@ def get(id):
     ))
 
 
-@accounts.route('/<int:id>', methods=['PUT'])
 def update(id):
 
     account = container.repositories.accounts.first(id=id)
@@ -78,6 +77,28 @@ def update(id):
     ))
 
 
-@accounts.route('/<int:id>', methods=['DELETE'])
 def delete():
-    pass
+    account = container.repositories.accounts.first(id=id)
+
+    if not account:
+        pass
+
+    container.services.accounts.delete(account)
+
+    return jsonify(dict())
+
+
+accounts.add_url_rule('', 'index', m(auth_admin, index), methods=['GET'])
+accounts.add_url_rule(
+    '/register', 'register', m(auth_gatekeeper, create), methods=['POST']
+)
+accounts.add_url_rule(
+    '/<int:id>', 'view', m(auth_secured, view), methods=['GET']
+)
+accounts.add_url_rule(
+    '/<int:id>', 'update', m(auth_secured, auth_owner, update), methods=['PUT']
+)
+accounts.add_url_rule(
+    '/<int:id>', 'delete', m(auth_secured, auth_owner, delete),
+    methods=['DELETE']
+)

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
+import jsonschema
 from ..container import container
 from .. import auth
 
 
 def m(*args):
+    '''m defines a list of route middlewares that will be applied in order.
+    '''
 
     def wrapped(*args, **kwargs):
         for item in args:
@@ -77,3 +80,12 @@ def auth_manager():
         return
 
     return jsonify(dict()), 401
+
+
+def validate(*path):
+    schema = current_app.extensions['jsonschema'].get_schema(path)
+    try:
+        jsonschema.validate(request.json, schema)
+    except jsonschema.ValidationError:
+        # TODO build JSON-API compliant error responses
+        return jsonify(dict()), 422

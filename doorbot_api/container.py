@@ -42,7 +42,7 @@ class Container(object):
         if ctx is None:
             return None
 
-        if not hasattr(ctx, 'doorbot_account_id'):
+        if not hasattr(ctx, 'doorbot_account'):
             return None
 
         if not hasattr(ctx, 'doorbot_account'):

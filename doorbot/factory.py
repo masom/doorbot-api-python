@@ -11,7 +11,7 @@ class SubdomainDispatcher(object):
     def __init__(self, domain, config=None, debug=False):
         self.apps = {
             'admin': create_admin_app(config),
-            'scoped': create_scoped_app(config),
+            'api': create_api_app(config),
             'public': create_public_app(config)
         }
 
@@ -30,7 +30,7 @@ class SubdomainDispatcher(object):
         if parts[0] == 'admin':
             return self.apps['admin']
 
-        return self.apps['scoped']
+        return self.apps['api']
 
     def __call__(self, environ, start_response):
         app = self.get_application(environ['HTTP_HOST'])
@@ -72,7 +72,7 @@ def create_public_app(config=None):
     return app
 
 
-def create_scoped_app(config=None):
+def create_api_app(config=None):
     app = Flask(__name__)
 
     if config:
@@ -83,7 +83,7 @@ def create_scoped_app(config=None):
     db.init_app(app)
     container.init_app(app)
 
-    from .views.scoped import (accounts, auth)
+    from .views.api import (accounts, auth)
 
     app.register_blueprint(auth)
     app.register_blueprint(accounts)

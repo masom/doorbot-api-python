@@ -5,8 +5,11 @@ from ..security import generate_random_string
 
 
 class HostGenerator(Service):
+    '''Generates hosts'''
 
     def random(self, length):
+        '''Generate a random hostname'''
+
         accounts = self._repositories.accounts
 
         for attempt in xrange(10):
@@ -20,5 +23,3 @@ class HostGenerator(Service):
 
         # TODO maybe throw an exception here?
         return None
-
-

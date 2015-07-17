@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from werkzeug.serving import run_simple
-from doorbot_api.factory import SubdomainDispatcher
+from doorbot.factory import SubdomainDispatcher
 
 
 application = SubdomainDispatcher(

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from ...container import container
-from ...middleswares import (
-    m, auth_owner, auth_secured
+from ...middlewares import (
+    m, auth_owner, auth_secured, validate
 )
 
-accounts = Blueprint('account', __name__, url_prefix='/account')
+accounts = Blueprint('account', __name__, url_prefix='/api/account')
 
 
 class PublicAccount(object):
@@ -34,21 +33,21 @@ def view():
     authorization = container.authorization
 
     if authorization.is_administrator():
-        return jsonify(dict(
+        return dict(
             account=account
-        ))
+        )
 
     if authorization.is_person():
         if authorization.person.is_account_manager():
-            return jsonify(dict(
+            return dict(
                 account=account
-            ))
+            )
         else:
-            return jsonify(dict(
+            return dict(
                 account=PublicAccount.from_account(account).to_dict()
-            ))
+            )
 
-    return jsonify(dict()), 403
+    return dict(), 403
 
 
 def update():
@@ -60,9 +59,9 @@ def update():
 
     container.services.accounts.update(account)
 
-    return jsonify(dict(
+    return dict(
         account=account
-    ))
+    )
 
 accounts.add_url_rule(
     '', 'view', m(auth_secured, view),
@@ -70,6 +69,7 @@ accounts.add_url_rule(
 )
 
 accounts.add_url_rule(
-    '', 'update', m(auth_secured, auth_owner, update),
+    '', 'update',
+    m(auth_secured, auth_owner, validate('account_update'), update),
     methods=['PUT']
 )

@@ -8,19 +8,43 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def _log_unauthorized_access(**context):
     context['module'] = __name__
-    logger.info("{method} unauthorized access", context);
+    logger.info("{method} unauthorized access", context)
 
-def m(*args):
+
+def handle_response(rv):
+    """Handle rending the proper response
+    :param rv: The return value from a view / middleware. Can be a tuple.
+    """
+
+    # Determine the best response type from the request.
+    # Will be used to port response to JSONAPI
+    best = request.accept_mimetypes.best_match([
+        'application/json', 'application/vnd.json+api'
+    ])
+
+    if best == 'application/json':
+        if isinstance(rv, tuple):
+            rv, rc = rv
+            return jsonify(rv), rc
+
+        if isinstance(rv, dict):
+            return jsonify(rv)
+    else:
+        return jsonify({}), 406
+
+
+def m(*mw):
     '''m defines a list of route middlewares that will be applied in order.
     '''
 
     def wrapped(*args, **kwargs):
-        for item in args:
-            ret = item(*args, **kwargs)
-            if ret:
-                return ret
+        for item in mw:
+            rv = item(*args, **kwargs)
+            if rv:
+                return handle_response(rv)
 
     return wrapped
 
@@ -96,6 +120,7 @@ def auth_secured():
                 method="auth_secured", mode=mode, token=token,
                 account_id=container.account.id
             )
+        )
 
         return jsonify(dict()), 401
 
@@ -109,10 +134,19 @@ def auth_manager():
     return jsonify(dict()), 401
 
 
-def validate(*path):
-    schema = current_app.extensions['jsonschema'].get_schema(path)
-    try:
-        jsonschema.validate(request.json, schema)
-    except jsonschema.ValidationError:
-        # TODO build JSON-API compliant error responses
-        return jsonify(dict()), 422
+def validate(name):
+    """Validate the request data with the given JSON schema name
+    :param name: Name of the json schema
+    :type name: string
+    """
+
+    def wrapped(*args, **kwargs):
+        schema = current_app.extensions['jsonschema'].get_schema(name)
+
+        try:
+            jsonschema.validate(request.json, schema)
+        except jsonschema.ValidationError:
+            # TODO let the Flask error handler pickup this error.
+            return jsonify({}), 422
+
+    return wrapped

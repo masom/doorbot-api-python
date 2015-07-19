@@ -7,7 +7,7 @@ from ..midlewares import(
 from ...container import container
 
 
-doors = Blueprint('doors', __name__, url_prefix='/doors')
+doors = Blueprint('doors', __name__, url_prefix='/api/doors')
 
 
 def index():

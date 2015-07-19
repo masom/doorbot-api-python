@@ -1,17 +1,50 @@
 from flask import Blueprint, jsonify, request
 from ...middlewares import (
-    m, auth_secured, auth_manager
+    m, auth_secured, auth_manager, validate
 )
 from ...container import container
 
 
-people = Blueprint('people', __name__, url_prefix='/people')
+people = Blueprint('people', __name__, url_prefix='/api/people')
+
+
+class PublicPerson(object):
+    def __init__(self, id, name, email, is_available):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.is_available = is_available
+
+    def to_dict(self):
+        return dict(
+            id=self.id, name=self.name, email=self.email,
+            is_available=self.is_available
+        )
+
+    @classmethod
+    def from_person(cls, person):
+        return cls(
+            id=person.id,
+            name=person.name,
+            email=person.email,
+            is_available=person.is_available
+        )
 
 
 def index():
     people = container.repositories.people.all()
 
-    return jsonify(dict(people=people))
+    authorization = container.authorization
+
+    if authorization.is_administrator():
+        return jsonify(dict(people=people))
+
+    return jsonify(dict(
+        people=[
+            PublicPerson.from_person(person).to_dict()
+            for person in people
+        ]
+    ))
 
 
 def view(id):
@@ -74,7 +107,9 @@ people.add_url_rule(
 )
 
 people.add_url_rule(
-    '', 'create', m(auth_secured, auth_manager, create), methods=['POST']
+    '', 'create',
+    m(validate('person_create'), create),  # auth_secured, auth_manager,
+    methods=['POST']
 )
 
 people.add_url_rule(
@@ -85,7 +120,7 @@ people.add_url_rule(
 
 people.add_url_rule(
     '/<int:id>', 'update',
-    m(auth_secured, update),
+    m(auth_secured, validate('person_update'), update),
     methods=['PUT']
 )
 

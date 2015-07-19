@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os
 from flask import Flask
-
 from .container import container
 from .db import db
+from .schema_validator import jsonschema
 
 
 class SubdomainDispatcher(object):
@@ -78,14 +79,18 @@ def create_api_app(config=None):
     if config:
         app.config.from_pyfile(config)
 
+    app.config['JSONSCHEMA_DIR'] = os.path.abspath('doorbot/views/api/schemas')
+
     app.url_map.strict_slashes = False
 
+    jsonschema.init_app(app)
     db.init_app(app)
     container.init_app(app)
 
-    from .views.api import (accounts, auth)
+    from .views.api import (accounts, auth, people)
 
     app.register_blueprint(auth)
     app.register_blueprint(accounts)
+    app.register_blueprint(people)
 
     return app

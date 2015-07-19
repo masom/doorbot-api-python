@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ...container import container
-from ...middleswares import (
+from ...middlewares import (
     m, auth_admin, auth_secured
 )
 

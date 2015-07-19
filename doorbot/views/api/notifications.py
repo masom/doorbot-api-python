@@ -7,7 +7,7 @@ from ..midlewares import(
 from ...container import container
 
 
-notifications = Blueprint('notifications', __name__, prefix='/notifications')
+notifications = Blueprint('notifications', __name__, prefix='/api/notifications')
 
 
 def notify():

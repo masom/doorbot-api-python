@@ -1,0 +1,18 @@
+<form action="{{url_for('public.register')}}" method="POST">
+    {{form.contact_name.label}}
+    {{form.contact_name}}
+
+    {{form.contact_email.label}}
+    {{form.contact_email}}
+
+    {{form.contact_phone_number.label}}
+    {{form.contact_phone_number}}
+
+    {{form.name.label}}
+    {{form.name}}
+
+    {{form.host.label}}
+    {{form.host}}
+
+    <button type="submit">Register</button>
+</form>

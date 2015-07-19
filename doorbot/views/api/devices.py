@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..midlewares import(
+from ...middlewares import(
     m, auth_secured, auth_manager
 )
 from ...container import container
@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-devices = Blueprint('devices', __name__, url_prefix='/devices')
+devices = Blueprint('devices', __name__, url_prefix='/api/devices')
 
 
 def index():

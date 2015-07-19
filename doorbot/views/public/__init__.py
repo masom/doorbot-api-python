@@ -1,7 +1,10 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from ...container import container
+from .forms import RegistrationForm
 
-public = Blueprint('public', __name__, url_prefix='')
+public = Blueprint(
+    'public', __name__, url_prefix='/', template_folder='templates'
+)
 
 
 @public.route('', methods=['GET'])
@@ -14,16 +17,17 @@ def status():
     return jsonify(dict(status="ok"))
 
 
-@public.route('/register', methods=['GET'])
+@public.route('register', methods=['GET'])
 def register():
-    return 'derp'
+    form = RegistrationForm()
+    return render_template('register.html', form=form)
 
 
-@public.route('/register', methods=['POST'])
+@public.route('register', methods=['POST'])
 def do_register():
 
     services = container.services
-    result = services.accounts.register(request.data)
+    result = services.accounts.create(request.data)
 
     if result.get('error', False):
         return jsonify(dict()), 500

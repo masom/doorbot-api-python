@@ -1,9 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ...container import container
 from ...security.policies import get_policy_for_person
-from ...middleswares import (m, validate)
+from ...middlewares import (m, validate)
 
-auth = Blueprint('auth', __name__, url_prefix='/auth')
+auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 
 def password():
@@ -12,9 +12,9 @@ def password():
     )
 
     if result.get('error', False):
-        pass
+        return dict(), 401
 
-    return jsonify(dict(
+    return dict(
         authentication=dict(
             token="{person_id}.{token}".format(
                 person_id=result.person.id,
@@ -23,7 +23,7 @@ def password():
         ),
         person=result.person,
         policy=get_policy_for_person(result.person)
-    ))
+    )
 
 
 def token():
@@ -32,12 +32,12 @@ def token():
 
 auth.add_url_rule(
     '/password', 'password',
-    m(validate('authentication', 'password'), password),
+    m(validate('authentication'), password),
     methods=['POST']
 )
 
 auth.add_url_rule(
     '/token', 'token',
-    m(validate('authentication', 'token'), token),
+    m(validate('authentication'), token),
     methods=['POST']
 )

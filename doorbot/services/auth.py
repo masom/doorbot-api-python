@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-
-import logging
-logger = logging.getLogger(__name__)
-
 from ..auth import (PROVIDER_PASSWORD, PROVIDER_API_TOKEN)
 from ..core.repository import Repository
 from ..security import generate_password
+from structlog import get_logger
+
+logger = get_logger()
 
 
 class Auth(Repository):

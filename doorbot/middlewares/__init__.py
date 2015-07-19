@@ -4,14 +4,15 @@ from flask import jsonify, request, current_app
 import jsonschema
 from ..container import container
 from .. import auth
-import logging
+import uuid
+from structlog import get_logger
 
-logger = logging.getLogger(__name__)
+log = get_logger()
 
 
 def _log_unauthorized_access(**context):
     context['module'] = __name__
-    logger.info("{method} unauthorized access", context)
+    log.info("{method} unauthorized access", context)
 
 
 def handle_response(rv):
@@ -36,11 +37,18 @@ def handle_response(rv):
         return jsonify({}), 406
 
 
+def _logger_context():
+    log.new(
+        request_id=str(uuid.uuid4()),
+    )
+
+
 def m(*mw):
     '''m defines a list of route middlewares that will be applied in order.
     '''
 
     def wrapped(*args, **kwargs):
+        _logger_context()
         for item in mw:
             rv = item(*args, **kwargs)
             if rv:
@@ -115,7 +123,7 @@ def auth_secured():
         authorization.update_to_administrator(admin)
 
     else:
-        logger.info(
+        log.info(
             _log_unauthorized_access(
                 method="auth_secured", mode=mode, token=token,
                 account_id=container.account.id

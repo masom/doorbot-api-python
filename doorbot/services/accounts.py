@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
-logger = logging.getLogger(__name__)
 
 from ..core.service import Service
 from ..security import generate_password, password_crypt
+from structlog import get_logger
+
+logger = get_logger()
 
 
 class Accounts(Service):
@@ -29,19 +30,23 @@ class Accounts(Service):
             session.commit()
 
             logger.info(
-                '{module} account created'.format(module=__name__),
-                module=__name__,
-                account_id=account.id,
-                account_host=account.host,
-                person_id=auth.person_id,
-                password=password
+                '{module} account created', dict(
+                    extra=dict(
+                        module=__name__,
+                        account_id=account.id,
+                        account_host=account.host,
+                        person_id=auth.person_id,
+                        password=password
+                    )
+                )
             )
 
         except Exception as e:
             logger.error(
-                '{module} creation error'.format(module=__name__),
-                error=e,
-                module=__name__
+                '{module} creation error',
+                extra=dict(
+                    error=e,
+                )
             )
 
             session.rollback()
@@ -71,9 +76,11 @@ class Accounts(Service):
         accounts.delete(account)
 
         logger.info(
-            '{module} account deleted'.format(module=__name__),
-            module=__name__,
-            account_id=account.id
+            '{module} account deleted',
+            extra=dict(
+                module=__name__,
+                account_id=account.id
+            )
         )
 
     def _generate_host(self, requested):

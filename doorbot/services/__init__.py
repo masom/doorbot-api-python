@@ -3,7 +3,6 @@
 from .accounts import Accounts
 from .auth import Auth
 from .host_generator import HostGenerator
-from .. import repositories
 
 
 class Services(object):
@@ -26,7 +25,7 @@ class Services(object):
 
         repo = self._instances.get(attr, None)
         if not repo:
-            repo = klass(self, repositories)
+            repo = klass(self, self._repositories)
             self._instances[attr] = repo
 
         return repo

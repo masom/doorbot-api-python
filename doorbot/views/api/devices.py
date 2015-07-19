@@ -3,9 +3,9 @@ from ...middlewares import(
     m, auth_secured, auth_manager
 )
 from ...container import container
-import logging
+from structlog import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 devices = Blueprint('devices', __name__, url_prefix='/api/devices')
 

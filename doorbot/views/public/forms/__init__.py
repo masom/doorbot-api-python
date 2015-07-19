@@ -7,7 +7,7 @@ class RegistrationForm(Form):
     )
 
     contact_email = StringField(
-        'Contact Email', [validators.Email, validators.Length(max=255)]
+        'Contact Email', [validators.Email(), validators.Length(max=255)]
     )
 
     contact_phone_number = StringField(

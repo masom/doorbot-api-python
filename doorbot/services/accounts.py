@@ -10,18 +10,19 @@ logger = get_logger()
 
 class Accounts(Service):
 
-    def create(self, request):
+    def create(self, data):
         session = self._repositories.session
 
         try:
-            host = self._generate_host(request.account.host)
+            host = self._generate_host(data['host'])
 
-            request.account.host = host
-            account = self._create_account(request.account)
+            data.host = host
+
+            account = self._create_account(data)
 
             self._repositories.set_account_scope(account.id)
 
-            owner = self._create_account_owner(account, request.account)
+            owner = self._create_account_owner(account, data)
 
             (auth, password) = self._create_account_owner_auth(owner)
 
@@ -30,23 +31,18 @@ class Accounts(Service):
             session.commit()
 
             logger.info(
-                '{module} account created', dict(
-                    extra=dict(
-                        module=__name__,
-                        account_id=account.id,
-                        account_host=account.host,
-                        person_id=auth.person_id,
-                        password=password
-                    )
+                'account created', dict(
+                    account_id=account.id,
+                    account_host=account.host,
+                    person_id=auth.person_id,
+                    password=password
                 )
             )
 
         except Exception as e:
             logger.error(
-                '{module} creation error',
-                extra=dict(
-                    error=e,
-                )
+                'account creation error',
+                error=e
             )
 
             session.rollback()
@@ -55,18 +51,18 @@ class Accounts(Service):
 
         return dict(account=account)
 
-    def update(self, account, request):
+    def update(self, account, data):
         '''
         :param account:
-        :param request:
+        :param data:
         '''
 
         accounts = self._repositories.accounts
 
-        account.name = request.account.name
-        account.notifications_enabled = request.account.notifications_enabled
-        account.notifications_email_enabled = request.account.notifications_email_enabled
-        account.notifications_sms_enabled = request.account.notifications_sms_enabled
+        account.name = data.account.name
+        account.notifications_enabled = data.account.notifications_enabled
+        account.notifications_email_enabled = data.account.notifications_email_enabled
+        account.notifications_sms_enabled = data.account.notifications_sms_enabled
 
         accounts.save(account, True)
 
@@ -83,50 +79,48 @@ class Accounts(Service):
             )
         )
 
-    def _generate_host(self, requested):
+    def _generate_host(self, data):
         accounts = self._repositories.accounts
 
-        if requested:
-            exists = accounts.first(dict(host=requested))
+        if data:
+            exists = accounts.first(host=data)
 
             if exists:
                 logger.warning(
-                    '{module} host is already taken'.format(module=__name__),
-                    module=__name__,
-                    host=requested
+                    'account register host is already taken',
+                    host=data
                 )
 
                 return False
 
-            host = requested
+            host = data
         else:
             host = self._services.host_generator.random(10)
 
         if not host:
             logger.error(
-                '{module} invalid host'.format(module=__name__),
-                requested=requested,
-                host=host,
-                module=__name__
+                'account register invalid host',
+                data=data
             )
 
             return False
 
+        logger.info('account host generated', host=host)
         return host
 
-    def _create_account(self, requested):
+    def _create_account(self, data):
         '''
-        :param request:
+        :param data:
         '''
 
         accounts = self._repositories.accounts
 
         account = accounts.new()
-        account.host = requested.host
-        account.name = requested.name
-        account.contact_name = requested.contact_name
-        account.contact_email = requested.contact_email
-        account.contact_phone_number = requested.contact_phone_number
+        account.host = data.host
+        account.name = data.name
+        account.contact_name = data.contact_name
+        account.contact_email = data.contact_email
+        account.contact_phone_number = data.contact_phone_number
 
         account.is_enabled = False
         account.notifications_enabled = False
@@ -137,17 +131,17 @@ class Accounts(Service):
 
         return account
 
-    def _create_account_owner(self, account, requested):
+    def _create_account_owner(self, account, data):
         '''
         :param account:
-        :param requested:
+        :param data:
         '''
 
         people = self._repositories.people
 
         person = people.new()
-        person.name = requested.contact_name
-        person.email = requested.contact_email
+        person.name = data.contact_name
+        person.email = data.contact_email
         person.account_type = account.TYPE_OWNER
 
         people.create(person, False)

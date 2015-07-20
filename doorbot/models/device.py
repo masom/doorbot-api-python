@@ -13,7 +13,7 @@ class Device(DeclarativeBase):
 
     name = Column(String)
     device_id = Column(String)
-    door_id = Column(Integer)
+    door_id = Column(Integer, ForeignKey("doors.id"), nullable=True)
     make = Column(String)
     description = Column(String)
     is_enabled = Column(Boolean, default=False)

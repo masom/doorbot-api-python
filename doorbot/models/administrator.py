@@ -11,7 +11,7 @@ class Administrator(DeclarativeBase):
     __tablename__ = 'administrators'
 
     id = Column(Integer, primary_key=True)
-    email = Column(String)
+    email = Column(String, nullable=False)
     name = Column(String)
 
     is_deleted = Column(Boolean, nullable=False, default=False)

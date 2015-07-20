@@ -17,7 +17,7 @@ class Person(DeclarativeBase):
 
     name = Column(String)
     title = Column(String)
-    email = Column(String)
+    email = Column(String, nullable=False)
     phone_number = Column(String)
     is_visible = Column(Boolean, default=True, nullable=False)
     is_available = Column(Boolean, default=True, nullable=False)

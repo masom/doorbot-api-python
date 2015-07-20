@@ -14,7 +14,7 @@ class AdministratorAuthentication(DeclarativeBase):
     administrator_id = Column(
         Integer, ForeignKey("administrators.id"), nullable=False
     )
-    provider_id = Column(Integer)
+    provider_id = Column(Integer, nullable=False)
     is_deleted = Column(Boolean, default=False, nullable=False)
     token = Column(String, nullable=False)
     last_used_at = Column(DateTime)

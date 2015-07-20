@@ -18,14 +18,14 @@ class Account(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
-    is_enabled = Column(Boolean, default=True)
-    is_deleted = Column(Boolean, default=False)
+    is_enabled = Column(Boolean, default=True, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
 
     host = Column(String, nullable=False)
 
     contact_name = Column(String, nullable=False)
     contact_email = Column(String, nullable=False)
-    contact_email_confirmed = Column(Boolean, default=False)
+    contact_email_confirmed = Column(Boolean, default=False, nullable=False)
     contact_phone_number = Column(String)
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

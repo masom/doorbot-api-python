@@ -16,8 +16,8 @@ class Device(DeclarativeBase):
     door_id = Column(Integer, ForeignKey("doors.id"), nullable=True)
     make = Column(String)
     description = Column(String)
-    is_enabled = Column(Boolean, default=False)
-    is_deleted = Column(Boolean, default=False)
+    is_enabled = Column(Boolean, default=False, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
 
     token = Column(String)
 

@@ -3,6 +3,7 @@
 from flask import jsonify, request, current_app
 import jsonschema
 from ..container import container
+from ..models import Account
 from .. import auth
 import uuid
 from structlog import get_logger
@@ -57,11 +58,21 @@ def m(*mw):
     return wrapped
 
 
+def account_scope():
+    account = container.database.query(Account).first(
+        host=request.environ['DOORBOT_ACCOUNT_HOST']
+    )
+    if not account:
+        return dict(), 404
+
+    container.set_account(account)
+
+
 def auth_admin():
     if container.authorization.is_administrator():
         return
 
-    return jsonify(dict()), 403
+    return dict(), 403
 
 
 def auth_gatekeeper():
@@ -74,7 +85,7 @@ def auth_owner():
     if authorization.is_person() and authorization.person.is_account_owner():
         return
 
-    return jsonify(dict()), 403
+    return dict(), 403
 
 
 def auth_secured():
@@ -83,7 +94,7 @@ def auth_secured():
     )
 
     if not mode or not token:
-        return jsonify(dict()), 401
+        return dict(), 401
 
     authorization = container.authorization
     if mode == auth.AUTHORIZATION_DEVICE:
@@ -94,7 +105,7 @@ def auth_secured():
                 account_id=container.account.id
             )
 
-            return jsonify(dict()), 401
+            return dict(), 401
 
         authorization.update_to_device(device)
 
@@ -106,7 +117,7 @@ def auth_secured():
                 account_id=container.account.id
             )
 
-            return jsonify(dict()), 401
+            return dict(), 401
 
         authorization.update_to_person(person)
 
@@ -118,7 +129,7 @@ def auth_secured():
                 method="auth_secured", mode=mode, token=token,
                 account_id=container.account.id
             )
-            return jsonify(dict()), 401
+            return dict(), 401
 
         authorization.update_to_administrator(admin)
 
@@ -130,7 +141,7 @@ def auth_secured():
             )
         )
 
-        return jsonify(dict()), 401
+        return dict(), 401
 
 
 def auth_manager():
@@ -139,7 +150,7 @@ def auth_manager():
     if authorization.is_person() and authorization.person.is_account_manager():
         return
 
-    return jsonify(dict()), 401
+    return dict(), 401
 
 
 def validate(name):
@@ -155,6 +166,6 @@ def validate(name):
             jsonschema.validate(request.json, schema)
         except jsonschema.ValidationError:
             # TODO let the Flask error handler pickup this error.
-            return jsonify({}), 422
+            return {}), 422
 
     return wrapped

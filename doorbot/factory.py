@@ -21,8 +21,8 @@ class SubdomainDispatcher(object):
 
         self.domain = domain
 
-    def get_application(self, host):
-        host = host.split(':')[0]
+    def get_application(self, environ):
+        host = environ['HTTP_HOST'].split(':')[0]
         parts = host.split('.')
 
         if len(parts) != 3:
@@ -31,10 +31,12 @@ class SubdomainDispatcher(object):
         if parts[0] == 'admin':
             return self.apps['admin']
 
+        # Save the parsed subdomain to DOORBOT_ACCOUNT_HOST
+        environ['DOORBOT_ACCOUNT_HOST'] = parts[0]
         return self.apps['api']
 
     def __call__(self, environ, start_response):
-        app = self.get_application(environ['HTTP_HOST'])
+        app = self.get_application(environ)
         return app(environ, start_response)
 
 

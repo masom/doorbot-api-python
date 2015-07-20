@@ -3,7 +3,6 @@
 from flask import _request_ctx_stack as stack
 
 from .services import Services
-from .repositories import Repositories
 from .auth import Authorization
 from .db import db
 
@@ -16,12 +15,12 @@ class Container(object):
     def teardown(self, exception):
         pass
 
-    def set_account_scope(self, id):
+    def set_account(self, account):
         ctx = stack.top
         if ctx is None:
             return None
 
-        ctx.doorbot_account_id = id
+        ctx.doorbot_account = account
 
     @property
     def authorization(self):
@@ -45,15 +44,10 @@ class Container(object):
         if not hasattr(ctx, 'doorbot_account'):
             return None
 
-        if not hasattr(ctx, 'doorbot_account'):
-            ctx.doorbot_account = self.repositories.accounts.first(
-                id=ctx.doorbot_account_id
-            )
-
         return ctx.doorbot_account
 
     @property
-    def database_session(self):
+    def database(self):
         ctx = stack.top
 
         if ctx is None:
@@ -72,20 +66,8 @@ class Container(object):
             return None
 
         if not hasattr(ctx, 'doorbot_services'):
-            ctx.doorbot_services = Services(self.repositories)
+            ctx.doorbot_services = Services(self.database)
 
         return ctx.doorbot_services
-
-    @property
-    def repositories(self):
-        ctx = stack.top
-
-        if ctx is None:
-            return None
-
-        if not hasattr(ctx, 'doorbot_repositories'):
-            ctx.doorbot_repositories = Repositories(self.database_session)
-
-        return ctx.doorbot_repositories
 
 container = Container()

@@ -52,12 +52,12 @@ def view():
 
 def update():
 
-    account = container.repositories.accounts.first(id=id)
+    account = container.account
 
     if not account:
         pass
 
-    container.services.accounts.update(account)
+    container.database.commit()
 
     return dict(
         account=account

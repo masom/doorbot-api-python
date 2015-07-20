@@ -2,6 +2,7 @@
 
 
 class Service(object):
-    def __init__(self, services=None, repositories=None):
-        self._repositories = repositories
-        self._services = services
+    def __init__(self, services=None, database=None, account=None):
+        self.services = services
+        self.database = database
+        self.account = account

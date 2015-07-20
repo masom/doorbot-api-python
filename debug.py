@@ -3,9 +3,19 @@
 from werkzeug.serving import run_simple
 from doorbot.factory import SubdomainDispatcher
 import logging
-logging.basicConfig()
-
 import structlog
+import sys
+
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+ch.setFormatter(formatter)
+root.addHandler(ch)
+
 
 structlog.configure(
     processors=[
@@ -19,7 +29,7 @@ structlog.configure(
 
 application = SubdomainDispatcher(
     domain='doorbot.dev',
-    config=None,
+    config='../config_debug.py',
     debug=True
 )
 

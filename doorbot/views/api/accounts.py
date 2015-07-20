@@ -3,7 +3,7 @@
 from flask import Blueprint
 from ...container import container
 from ...middlewares import (
-    m, auth_owner, auth_secured, validate
+    s, auth_owner, validate
 )
 
 accounts = Blueprint('account', __name__, url_prefix='/api/account')
@@ -64,12 +64,12 @@ def update():
     )
 
 accounts.add_url_rule(
-    '', 'view', m(auth_secured, view),
+    '', 'view', s(view),
     methods=['GET']
 )
 
 accounts.add_url_rule(
     '', 'update',
-    m(auth_secured, auth_owner, validate('account_update'), update),
+    s(auth_owner, validate('account_update'), update),
     methods=['PUT']
 )

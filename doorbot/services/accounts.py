@@ -3,53 +3,62 @@
 
 from ..core.service import Service
 from ..security import generate_password, password_crypt
+from ..auth import PROVIDER_PASSWORD
 from structlog import get_logger
+from ..models import Account, Person, PersonAuthentication
+
 
 logger = get_logger()
+
+
+class AccountCreatedResult(object):
+    def __init__(self, account, error):
+        self.account = account
+        self.error = error
 
 
 class Accounts(Service):
 
     def create(self, data):
-        session = self._repositories.session
+        database = self.database
 
         try:
             host = self._generate_host(data['host'])
 
-            data.host = host
+            data['host'] = host
 
             account = self._create_account(data)
-
-            self._repositories.set_account_scope(account.id)
 
             owner = self._create_account_owner(account, data)
 
             (auth, password) = self._create_account_owner_auth(owner)
 
-            self._services.notifications.account_created(account, owner)
+            self.services.notifications.account_created(account, owner)
 
-            session.commit()
+            database.commit()
 
             logger.info(
-                'account created', dict(
-                    account_id=account.id,
-                    account_host=account.host,
-                    person_id=auth.person_id,
-                    password=password
-                )
+                'account created',
+                account_id=account.id,
+                account_host=account.host,
+                person_id=auth.person_id,
+                password=password
             )
 
         except Exception as e:
+            import traceback
+
             logger.error(
                 'account creation error',
-                error=e
+                error=e,
+                trace=traceback.format_exc()
             )
 
-            session.rollback()
+            database.rollback()
 
-            return dict(account=None, error=e)
+            return AccountCreatedResult(account=None, error=e)
 
-        return dict(account=account)
+        return AccountCreatedResult(account=account)
 
     def update(self, account, data):
         '''
@@ -57,19 +66,15 @@ class Accounts(Service):
         :param data:
         '''
 
-        accounts = self._repositories.accounts
-
         account.name = data.account.name
         account.notifications_enabled = data.account.notifications_enabled
-        account.notifications_email_enabled = data.account.notifications_email_enabled
-        account.notifications_sms_enabled = data.account.notifications_sms_enabled
-
-        accounts.save(account, True)
+        account.notifications_email_enabled = \
+            data.account.notifications_email_enabled
+        account.notifications_sms_enabled = \
+            data.account.notifications_sms_enabled
 
     def delete(self, account):
-        accounts = self._repositories.accounts
-
-        accounts.delete(account)
+        self.database.delete(account)
 
         logger.info(
             '{module} account deleted',
@@ -80,10 +85,8 @@ class Accounts(Service):
         )
 
     def _generate_host(self, data):
-        accounts = self._repositories.accounts
-
         if data:
-            exists = accounts.first(host=data)
+            exists = self.database.query(Account).filter_by(host=data).first()
 
             if exists:
                 logger.warning(
@@ -95,7 +98,7 @@ class Accounts(Service):
 
             host = data
         else:
-            host = self._services.host_generator.random(10)
+            host = self.services.host_generator.random(10)
 
         if not host:
             logger.error(
@@ -113,21 +116,19 @@ class Accounts(Service):
         :param data:
         '''
 
-        accounts = self._repositories.accounts
-
-        account = accounts.new()
-        account.host = data.host
-        account.name = data.name
-        account.contact_name = data.contact_name
-        account.contact_email = data.contact_email
-        account.contact_phone_number = data.contact_phone_number
+        account = Account()
+        account.host = data['host']
+        account.name = data['name']
+        account.contact_name = data['contact_name']
+        account.contact_email = data['contact_email']
+        account.contact_phone_number = data['contact_phone_number']
 
         account.is_enabled = True
         account.notifications_enabled = False
         account.notifications_sms_enabled = False
         account.notifications_email_enabled = False
 
-        accounts.save(account, False)
+        self.database.add(account)
 
         return account
 
@@ -137,14 +138,12 @@ class Accounts(Service):
         :param data:
         '''
 
-        people = self._repositories.people
-
-        person = people.new()
-        person.name = data.contact_name
-        person.email = data.contact_email
+        person = Person()
+        person.name = data['contact_name']
+        person.email = data['contact_email']
         person.account_type = account.TYPE_OWNER
 
-        people.create(person, False)
+        account.people.append(person)
 
         return person
 
@@ -153,15 +152,13 @@ class Accounts(Service):
         :param owner:
         '''
 
-        authentications = self._repositories.authentications
-
         password = generate_password(8)
 
-        auth = authentications.new()
-        auth.person_id = owner.id
-        auth.provider_id = auth.PROVIDER_PASSWORD
-        auth.token = password_crypt(password)
+        authentication = PersonAuthentication()
+        authentication.person_id = owner.id
+        authentication.provider_id = PROVIDER_PASSWORD
+        authentication.token = password_crypt(password)
 
-        authentications.save(auth, False)
+        owner.authentications.append(authentication)
 
-        return (auth, password)
+        return (authentication, password)

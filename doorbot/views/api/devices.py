@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ...middlewares import(
-    m, auth_secured, auth_manager
+    s, auth_manager
 )
 from ...container import container
 from structlog import get_logger
@@ -66,27 +66,27 @@ def delete(id):
 
 
 devices.add_url_rule(
-    '', 'index', m(auth_secured, auth_manager, index), methods=['GET']
+    '', 'index', s(auth_manager, index), methods=['GET']
 )
 
 devices.add_url_rule(
-    '', 'create', m(auth_secured, auth_manager, create), methods=['POST']
+    '', 'create', s(auth_manager, create), methods=['POST']
 )
 
 devices.add_url_rule(
     '/<int:id>', 'view',
-    m(auth_secured, auth_manager, view),
+    s(auth_manager, view),
     methods=['GET']
 )
 
 devices.add_url_rule(
     '/<int:id>', 'update',
-    m(auth_secured, auth_manager, update),
+    s(auth_manager, update),
     methods=['PUT']
 )
 
 devices.add_url_rule(
     '/<int:id>', 'delete',
-    m(auth_secured, auth_manager, delete),
+    s(auth_manager, delete),
     methods=['DELETE']
 )

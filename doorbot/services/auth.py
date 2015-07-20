@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 from ..auth import (PROVIDER_PASSWORD, PROVIDER_API_TOKEN)
-from ..core.repository import Repository
+from ..core.service import Service
 from ..security import generate_password
 from structlog import get_logger
+from ..models import (
+    Administrator, AdministratorAuthentication
+)
 
 logger = get_logger()
 
 
-class Auth(Repository):
+class Auth(Service):
     def administrator_with_token(self, token):
 
-        authrepo = self._repositories.authentication
-
-        authentication = authrepo.find_by_provider_and_token(
-            PROVIDER_API_TOKEN,
-            token
+        db = self.database
+        auth = db.query(AdministratorAuthentication).first(
+            provider_id=PROVIDER_API_TOKEN,
+            token=token
         )
 
-        if not authentication:
+        if not auth:
             logger.warning(
                 '{module} administrator token not found'.format(
                     module=__name__
@@ -28,8 +30,8 @@ class Auth(Repository):
 
             return False
 
-        administrator = self._repositories.administrators.find(
-            authentication.administrator_id
+        administrator = db.query(Administrator).first(
+            id=auth.administrator_id
         )
 
         if not administrator:
@@ -37,9 +39,9 @@ class Auth(Repository):
                 '{module} administrator not found'.format(
                     module=__name__
                 ),
-                account_id=self._repositories.account_id,
+                account_id=self.account.id,
                 token=token,
-                administrator_id=authentication.administrator_id,
+                administrator_id=auth.administrator_id,
                 module=__name__
             )
 
@@ -49,14 +51,14 @@ class Auth(Repository):
 
     def device_with_token(self, token):
 
-        device = self._repositories.devices.find_by_token(token)
+        device = self.account.devices.first(token=token)
 
         if not device:
             logger.warning(
                 '{module} device not found'.format(
                     module=__name__
                 ),
-                account_id=self._repositories.account_id,
+                account_id=self.account.id,
                 token=token,
                 module=__name__
             )
@@ -65,7 +67,7 @@ class Auth(Repository):
         if not device.is_enabled:
             logger.info(
                 '{module} device is disabled'.format(module=__name__),
-                account_id=self._repositories.account_id,
+                account_id=self.account_id,
                 token=token,
                 device_id=device.id,
                 module=__name__

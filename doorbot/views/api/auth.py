@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from ...container import container
 from ...security.policies import get_policy_for_person
-from ...middlewares import (m, validate)
+from ...middlewares import (m, account_scope, validate)
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -32,12 +32,12 @@ def token():
 
 auth.add_url_rule(
     '/password', 'password',
-    m(validate('authentication'), password),
+    m(account_scope, validate('authentication'), password),
     methods=['POST']
 )
 
 auth.add_url_rule(
     '/token', 'token',
-    m(validate('authentication'), token),
+    m(account_scope, validate('authentication'), token),
     methods=['POST']
 )

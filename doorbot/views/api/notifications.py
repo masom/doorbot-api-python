@@ -2,12 +2,14 @@
 
 from flask import Blueprint, jsonify, request
 from ..midlewares import(
-    m, auth_secured
+    s
 )
 from ...container import container
 
 
-notifications = Blueprint('notifications', __name__, prefix='/api/notifications')
+notifications = Blueprint(
+    'notifications', __name__, prefix='/api/notifications'
+)
 
 
 def notify():
@@ -28,6 +30,6 @@ def notify():
 
 notifications.add_url_rule(
     '/notify', 'notify',
-    m(auth_secured, notify),
+    s(notify),
     methods=['POST']
 )

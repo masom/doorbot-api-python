@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .integration import Integration
-import requests
+# import requests
 
 
 class Hub(Integration):
@@ -20,13 +20,13 @@ class Hub(Integration):
 
     def fetch_users(self):
 
-        # TODO
+        """
         url = "{base}/api/people".format(base=self.url)
 
         response = requests.get(url)
-        if response.code != requests.OK:
+        if response.code != request.OK:
             return []
-
+        """
         return []
 
     @classmethod

@@ -32,7 +32,9 @@ class Person(DeclarativeBase):
     notifications_sms_enabled = Column(Boolean, default=False, nullable=False)
 
     notifications = relationship("Notification", lazy="dynamic")
-    authentications = relationship("PersonAuthentication", lazy="dynamic")
+    authentications = relationship(
+        "PersonAuthentication", lazy="dynamic", backref='person'
+    )
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)

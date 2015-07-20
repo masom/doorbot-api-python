@@ -44,6 +44,13 @@ def _logger_context():
     )
 
 
+def s(*mw):
+    '''s defines a list of route middlewares that will be applied in order.
+    '''
+
+    return m(account_scope, auth_secured, *mw)
+
+
 def m(*mw):
     '''m defines a list of route middlewares that will be applied in order.
     '''
@@ -59,9 +66,9 @@ def m(*mw):
 
 
 def account_scope():
-    account = container.database.query(Account).first(
+    account = container.database.query(Account).filter_by(
         host=request.environ['DOORBOT_ACCOUNT_HOST']
-    )
+    ).first()
     if not account:
         return dict(), 404
 
@@ -166,6 +173,6 @@ def validate(name):
             jsonschema.validate(request.json, schema)
         except jsonschema.ValidationError:
             # TODO let the Flask error handler pickup this error.
-            return {}), 422
+            return {}, 422
 
     return wrapped

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ...middlewares import (
-    m, auth_secured, auth_manager, validate
+    s, auth_manager, validate
 )
 from ...container import container
 
@@ -103,33 +103,33 @@ def sync():
 
 
 people.add_url_rule(
-    '', 'index', m(auth_secured, index), methods=['GET']
+    '', 'index', s(index), methods=['GET']
 )
 
 people.add_url_rule(
     '', 'create',
-    m(validate('person_create'), create),  # auth_secured, auth_manager,
+    s(auth_manager, validate('person_create'), create),
     methods=['POST']
 )
 
 people.add_url_rule(
     '/<int:id>', 'view',
-    m(auth_secured, view),
+    s(view),
     methods=['GET']
 )
 
 people.add_url_rule(
     '/<int:id>', 'update',
-    m(auth_secured, validate('person_update'), update),
+    s(validate('person_update'), update),
     methods=['PUT']
 )
 
 people.add_url_rule(
     '/<int:id>', 'delete',
-    m(auth_secured, auth_manager, delete),
+    s(auth_manager, delete),
     methods=['DELETE']
 )
 
 people.add_url_rule(
-    '/sync', 'sync', m(auth_secured, auth_manager, sync), methods=['POST']
+    '/sync', 'sync', s(auth_manager, sync), methods=['POST']
 )

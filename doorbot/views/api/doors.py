@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 from ..midlewares import(
-    m, auth_secured, auth_manager
+    s, auth_manager
 )
 from ...container import container
 
@@ -65,27 +65,27 @@ def delete(id):
 
 
 doors.add_url_rule(
-    '', 'index', m(auth_secured, auth_manager, index), methods=['GET']
+    '', 'index', s(auth_manager, index), methods=['GET']
 )
 
 doors.add_url_rule(
-    '', 'create', m(auth_secured, auth_manager, create), methods=['POST']
+    '', 'create', s(auth_manager, create), methods=['POST']
 )
 
 doors.add_url_rule(
     '/<int:id>', 'view',
-    m(auth_secured, auth_manager, view),
+    s(auth_manager, view),
     methods=['GET']
 )
 
 doors.add_url_rule(
     '/<int:id>', 'update',
-    m(auth_secured, auth_manager, update),
+    s(auth_manager, update),
     methods=['PUT']
 )
 
 doors.add_url_rule(
     '/<int:id>', 'delete',
-    m(auth_secured, auth_manager, delete),
+    s(auth_manager, delete),
     methods=['DELETE']
 )

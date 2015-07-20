@@ -21,12 +21,19 @@ def upgrade():
         'accounts',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
-        sa.Column('is_enabled', sa.Boolean(), nullable=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=True),
+        sa.Column(
+            'is_enabled', sa.Boolean(), nullable=False, server_default=True
+        ),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
         sa.Column('host', sa.String(), nullable=False),
         sa.Column('contact_name', sa.String(), nullable=False),
         sa.Column('contact_email', sa.String(), nullable=False),
-        sa.Column('contact_email_confirmed', sa.Boolean(), nullable=True),
+        sa.Column(
+            'contact_email_confirmed', sa.Boolean(), nullable=False,
+            server_default=False
+        ),
         sa.Column('contact_phone_number', sa.String(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -38,7 +45,9 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('email', sa.String(), nullable=True),
         sa.Column('name', sa.String(), nullable=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
@@ -60,7 +69,9 @@ def upgrade():
         sa.Column('administrator_id', sa.Integer(), nullable=False),
         sa.Column('provider_id', sa.Integer(), nullable=True),
         sa.Column('token', sa.String(), nullable=False),
-        sa.Column('is_deleted', sa.Boolean(), nullable=False, default=False),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
         sa.Column('last_used_at', sa.DateTime(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['administrator_id'], ['administrators.id'], ),
@@ -90,7 +101,9 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('account_id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=False, default=False),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
         sa.PrimaryKeyConstraint('id')
@@ -105,27 +118,34 @@ def upgrade():
         sa.Column('title', sa.String(), nullable=True),
         sa.Column('email', sa.String(), nullable=True),
         sa.Column('phone_number', sa.String(), nullable=True),
-        sa.Column('is_visible', sa.Boolean(), nullable=True, default=True),
-        sa.Column('is_available', sa.Boolean(), nullable=True, default=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=False, default=False),
         sa.Column(
-            'notifications_enabled', sa.Boolean(), nullable=True, default=True
+            'is_visible', sa.Boolean(), nullable=True, server_default=True
+        ),
+        sa.Column(
+            'is_available', sa.Boolean(), nullable=True, server_default=True
+        ),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
+        sa.Column(
+            'notifications_enabled', sa.Boolean(), nullable=True,
+            server_default=True
         ),
         sa.Column(
             'notifications_app_enabled', sa.Boolean(), nullable=True,
-            default=True
+            server_default=True
         ),
         sa.Column(
             'notifications_chat_enabled', sa.Boolean(), nullable=True,
-            default=False
+            server_default=False
         ),
         sa.Column(
             'notifications_email_enabled', sa.Boolean(), nullable=True,
-            default=False
+            server_default=False
         ),
         sa.Column(
             'notifications_sms_enabled', sa.Boolean(), nullable=True,
-            default=False
+            server_default=False
         ),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -140,8 +160,12 @@ def upgrade():
         sa.Column('person_id', sa.Integer(), nullable=False),
         sa.Column('provider_id', sa.Integer(), nullable=False),
         sa.Column('token', sa.String(), nullable=False),
-        sa.Column('is_enabled', sa.Boolean(), nullable=False, default=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=False, default=False),
+        sa.Column(
+            'is_enabled', sa.Boolean(), nullable=False, server_default=True
+        ),
+        sa.Column(
+            'is_deleted', sa.Boolean(), nullable=False, server_default=False
+        ),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('last_used_at', sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),

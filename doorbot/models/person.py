@@ -19,13 +19,17 @@ class Person(DeclarativeBase):
     title = Column(String)
     email = Column(String)
     phone_number = Column(String)
-    is_visible = Column(Boolean)
-    is_available = Column(Boolean)
+    is_visible = Column(Boolean, default=True, nullable=False)
+    is_available = Column(Boolean, default=True, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
 
-    notifications_enabled = Column(Boolean)
-    notifications_app_enabled = Column(Boolean)
-    notifications_email_enabled = Column(Boolean)
-    notifications_sms_enabled = Column(Boolean)
+    notifications_enabled = Column(Boolean, default=True, nullable=False)
+    notifications_app_enabled = Column(Boolean, default=True, nullable=False)
+    notifications_chat_enabled = Column(Boolean, default=False, nullable=False)
+    notifications_email_enabled = Column(
+        Boolean, default=False, nullable=False
+    )
+    notifications_sms_enabled = Column(Boolean, default=False, nullable=False)
 
     notifications = relationship("Notification", lazy="dynamic")
     authentications = relationship("PersonAuthentication", lazy="dynamic")

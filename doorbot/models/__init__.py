@@ -5,9 +5,9 @@ from ..core.model import Base
 from .account import Account
 from .administrator import Administrator
 from .administrator_authentication import AdministratorAuthentication
-from .authentication import Authentication
 from .device import Device
 from .door import Door
 from .notification import Notification
 from .person import Person
+from .person_authentication import PersonAuthentication
 from .service_user import ServiceUser

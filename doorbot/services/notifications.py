@@ -7,6 +7,4 @@ logger = get_logger()
 
 class Notifications(Service):
     def account_created(self, account, owner):
-        logger.info(
-            "Account created", account=account.__dict__, owner=owner.__dict__
-        )
+        pass

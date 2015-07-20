@@ -12,7 +12,7 @@ logger = get_logger()
 
 
 class AccountCreatedResult(object):
-    def __init__(self, account, error):
+    def __init__(self, account, error=None):
         self.account = account
         self.error = error
 
@@ -24,6 +24,9 @@ class Accounts(Service):
 
         try:
             host = self._generate_host(data['host'])
+
+            if not host:
+                return AccountCreatedResult(account=None, error="")
 
             data['host'] = host
 

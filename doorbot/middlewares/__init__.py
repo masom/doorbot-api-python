@@ -171,7 +171,8 @@ def validate(name):
 
         try:
             jsonschema.validate(request.json, schema)
-        except jsonschema.ValidationError:
+        except jsonschema.ValidationError as e:
+            log.info("schema validation error", error=e)
             # TODO let the Flask error handler pickup this error.
             return {}, 422
 

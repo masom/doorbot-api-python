@@ -1,0 +1,11 @@
+db:
+    image: postgres:9.3
+    ports:
+        - "5432:5432"
+    environment:
+        - POSTGRES_PASSWORD=dev
+
+redis:
+    image: redis:2.8
+    ports:
+        - "6379:6379"

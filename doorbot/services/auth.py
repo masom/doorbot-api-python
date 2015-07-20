@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from ..auth import (PROVIDER_PASSWORD, PROVIDER_API_TOKEN)
 from ..core.service import Service
-from ..security import generate_password
+from ..security import generate_api_token
 from structlog import get_logger
 from ..models import (
-    Administrator, AdministratorAuthentication
+    Administrator, AdministratorAuthentication, PersonAuthentication
 )
 
 logger = get_logger()
@@ -82,7 +82,7 @@ class Auth(Service):
         if len(parts) != 2:
             logger.warning(
                 '{module} invalid person token'.format(module=__name__),
-                account_id=self._repositories.account_id,
+                account_id=self.account.id,
                 token=token,
                 module=__name__
             )
@@ -90,11 +90,11 @@ class Auth(Service):
             return False
 
         try:
-            id = int(parts[0], 10)
+            person_id = int(parts[0], 10)
         except ValueError:
             logger.warning(
                 '{module} invalid person id in token'.format(module=__name__),
-                account_id=self._repositories.account_id,
+                account_id=self.account.id,
                 token=token,
                 module=__name__
             )
@@ -103,80 +103,60 @@ class Auth(Service):
 
         token = parts[1]
 
-        authRepo = self._repositories.authentications
-        auth = authRepo.find_by_provider_id_and_person_id_and_token(
-            PROVIDER_API_TOKEN,
-            id,
-            token
-        )
+        auth = self.database.query(PersonAuthentication).filter_by(
+            account_id=self.account.id,
+            provider_id=PROVIDER_API_TOKEN,
+            person_id=person_id,
+            token=token
+        ).first()
 
         if not auth:
             logger.info(
                 '{module} authentication not found'.format(module=__name__),
-                account_id=self._repositories.account_id,
+                account_id=self.account.id,
                 token=token,
                 module=__name__
             )
 
             return False
 
-        person = self._repositories.people.find(auth.person_id)
-
-        if not person:
-            logger.error(
-                '{module} person not found'.format(module=__name__),
-                account_id=self._repositories.account_id,
-                token=token,
-                person_id=auth.person_id,
-                module=__name__
-            )
-
-            return False
-
-        return person
+        return auth.person
 
     def person_with_password(self, email, password):
-        person = self._repositories.people.first(email=email)
-        authrepo = self._repositories.authentication
+        person = self.account.people.filter_by(email=email).first()
 
         if not person:
-            logger.info(
-                '{module} person not found'.format(module=__name__),
-                account_id=self._repositories.account_id,
-                email=email,
-                module=__name__
-            )
-
             return False
 
-        authentication = authrepo.authentication.first(
-            provider_id=PROVIDER_PASSWORD,
-            person_id=person.id
-        )
+        auth = person.authentications.filter_by(
+            provider_id=PROVIDER_PASSWORD
+        ).first
 
-        if not authentication:
+        if not auth:
             logger.info(
                 '{module} person has no password auth'.format(module=__name__),
                 module=__name__,
                 person_id=person.id,
                 provider_id=PROVIDER_PASSWORD,
-                account_id=self._repositories.account.id
+                account_id=self.account.id
             )
 
             return False
 
-        token_auth = authrepo.authentication.first(
+        token_auth = person.authentications.first(
             provider_id=PROVIDER_API_TOKEN,
             person_id=person.id
         )
 
         if not token_auth:
             try:
-                token_auth = authrepo.create(
-                    person_id=person.id,
-                    provider_id=PROVIDER_API_TOKEN,
-                    token=generate_password(8)
-                )
+                token_auth = PersonAuthentication()
+                token_auth.provider_id = PROVIDER_API_TOKEN
+                token_auth.token = generate_api_token()
+
+                person.authentications.append(token_auth)
+
+                self.database.commit()
             except Exception as e:
                 logger.error(
                     '{module} api token creation error'.format(

@@ -7,8 +7,11 @@ auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 
 def password():
+    json = request.get_json()
+    authentication = json['authentication']
+
     result = container.services.auth.person_with_password(
-        request.data.password
+        authentication['email'], authentication['password']
     )
 
     if result.get('error', False):
@@ -32,12 +35,12 @@ def token():
 
 auth.add_url_rule(
     '/password', 'password',
-    m(account_scope, validate('authentication'), password),
+    m(account_scope, validate('authentication_password'), password),
     methods=['POST']
 )
 
 auth.add_url_rule(
     '/token', 'token',
-    m(account_scope, validate('authentication'), token),
+    m(account_scope, validate('authentication_token'), token),
     methods=['POST']
 )

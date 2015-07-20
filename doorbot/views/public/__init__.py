@@ -34,10 +34,12 @@ def do_register():
     services = container.services
     result = services.accounts.create(form.data)
 
-    if result.get('error', False):
+    if result.error:
         return render_template(
             'register.html',
-            error=result.get('error'), form=form
+            error=result.error, form=form
         )
 
-    return redirect("{host}.doorbot.dev".format(host=result.account.host))
+    return redirect(
+        "http://{host}.doorbot.dev".format(host=result.account.host)
+    )

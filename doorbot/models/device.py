@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
-from . import DeclarativeBase
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
+from ..core.model import DeclarativeBase
 
 
 class Device(DeclarativeBase):
     __tablename__ = 'devices'
 
     id = Column(Integer, primary_key=True)
-    account_id = Column(Integer)
+    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
 
     name = Column(String)
     device_id = Column(String)
@@ -17,6 +17,7 @@ class Device(DeclarativeBase):
     make = Column(String)
     description = Column(String)
     is_enabled = Column(Boolean, default=False)
+    is_deleted = Column(Boolean, default=False)
 
     token = Column(String)
 

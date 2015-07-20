@@ -122,7 +122,7 @@ class Accounts(Service):
         account.contact_email = data.contact_email
         account.contact_phone_number = data.contact_phone_number
 
-        account.is_enabled = False
+        account.is_enabled = True
         account.notifications_enabled = False
         account.notifications_sms_enabled = False
         account.notifications_email_enabled = False

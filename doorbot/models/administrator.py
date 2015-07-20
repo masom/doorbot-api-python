@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
-from . import DeclarativeBase
+from ..core.model import DeclarativeBase
 
 
 class Administrator(DeclarativeBase):
@@ -13,4 +14,10 @@ class Administrator(DeclarativeBase):
     email = Column(String)
     name = Column(String)
 
+    is_deleted = Column(Boolean, nullable=False, default=False)
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    authentications = relationship(
+        "AdministratorAuthentication", lazy="dynamic"
+    )

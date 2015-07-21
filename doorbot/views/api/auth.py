@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from ...container import container
 from ...security.policies import get_policy_for_person
 from ...middlewares import (m, account_scope, validate)
+from ...auth import AUTHORIZATION_DEVICE, AUTHORIZATION_PERSON
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -30,7 +31,37 @@ def password():
 
 
 def token():
-    pass
+    json = request.get_json()
+
+    authentication = json['authentication']
+    if authentication['type'] == AUTHORIZATION_DEVICE:
+        result = container.services.auth.device_with_token(
+            authentication['token']
+        )
+
+        if not result:
+            return {}, 401
+
+        return dict(
+            device=result
+        )
+
+    elif authentication['type'] == AUTHORIZATION_PERSON:
+        result = container.services.auth.person_with_token(
+            authentication['token']
+        )
+
+        if not result:
+            return {}, 401
+
+        return dict(
+            person=result,
+            policy=get_policy_for_person(result)
+        )
+    else:
+        return {}, 401
+
+
 
 
 auth.add_url_rule(

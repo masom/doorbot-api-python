@@ -14,10 +14,10 @@ class Auth(Service):
     def administrator_with_token(self, token):
 
         db = self.database
-        auth = db.query(AdministratorAuthentication).first(
+        auth = db.query(AdministratorAuthentication).filter_by(
             provider_id=PROVIDER_API_TOKEN,
             token=token
-        )
+        ).first()
 
         if not auth:
             logger.warning(
@@ -30,9 +30,9 @@ class Auth(Service):
 
             return False
 
-        administrator = db.query(Administrator).first(
+        administrator = db.query(Administrator).filter_by(
             id=auth.administrator_id
-        )
+        ).first()
 
         if not administrator:
             logger.error(
@@ -51,7 +51,7 @@ class Auth(Service):
 
     def device_with_token(self, token):
 
-        device = self.account.devices.first(token=token)
+        device = self.account.devices.filter_by(token=token).first()
 
         if not device:
             logger.warning(
@@ -143,10 +143,10 @@ class Auth(Service):
 
             return False
 
-        token_auth = person.authentications.first(
+        token_auth = person.authentications.filter_by(
             provider_id=PROVIDER_API_TOKEN,
             person_id=person.id
-        )
+        ).first()
 
         if not token_auth:
             try:
@@ -163,7 +163,7 @@ class Auth(Service):
                         module=__name__
                     ),
                     module=__name__,
-                    account_id=self._repositories.account_id,
+                    account_id=self.account.id,
                     person_id=person.id,
                     provider_id=PROVIDER_PASSWORD
                 )

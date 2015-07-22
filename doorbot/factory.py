@@ -5,11 +5,22 @@ from flask import Flask
 from .container import container
 from .db import db
 from .schema_validator import jsonschema
+from .sessions import ItsdangerousSessionInterface
 
 
 class SubdomainDispatcher(object):
+    """Dispatch requests to a specific app based on the subdomain.
+    """
 
     def __init__(self, domain, config=None, debug=False):
+        '''
+        :param domain: The domain the dispatcher is attached to.
+        :type domain: string
+        :param config:
+        :param debug: Force debug
+        :type debug: boolean
+        '''
+
         self.apps = {
             'admin': create_admin_app(config),
             'api': create_api_app(config),
@@ -22,6 +33,10 @@ class SubdomainDispatcher(object):
         self.domain = domain
 
     def get_application(self, environ):
+        """Get the proper application for the given http environment
+        :param environ: The environment dict
+        """
+
         host = environ['HTTP_HOST'].split(':')[0]
         parts = host.split('.')
 
@@ -53,6 +68,7 @@ def create_admin_app(config=None):
     from .views.admin import (accounts)
 
     app.register_blueprint(accounts)
+    app.session_interface = ItsdangerousSessionInterface()
 
     return app
 

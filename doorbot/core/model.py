@@ -1,6 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
 from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.orm.query import Query
+
 
 try:
     import simplejson as json

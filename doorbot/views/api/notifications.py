@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 from ..midlewares import(
-    s
+    s, validate
 )
 from ...container import container
 
@@ -13,15 +13,15 @@ notifications = Blueprint(
 
 
 def notify():
-    repositories = container.repositories
-    person = repositories.people.first(id=request.data.person_id)
-    door = repositories.doors.first(id=request.data.door_id)
+    account = container.account
+    person = account.people.filter_by(id=request.data.person_id).first()
+    door = account.doors.filter_by(id=request.data.door_id).first()
 
     if not door:
-        pass
+        return dict(), 422
 
     if not person:
-        pass
+        return dict(), 422
 
     container.services.notifications.knock_knock(person, door)
 
@@ -30,6 +30,6 @@ def notify():
 
 notifications.add_url_rule(
     '/notify', 'notify',
-    s(notify),
+    s(validate('notifications_notify'), notify),
     methods=['POST']
 )

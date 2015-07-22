@@ -6,7 +6,7 @@ import logging
 import structlog
 import sys
 
-root = logging.getLogger()
+root = logging.getLogger('doorbot')
 root.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
@@ -15,6 +15,7 @@ formatter = logging.Formatter(
 )
 ch.setFormatter(formatter)
 root.addHandler(ch)
+root.propagate = False
 
 
 structlog.configure(

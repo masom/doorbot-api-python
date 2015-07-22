@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ...middlewares import(
-    s, auth_manager
+    s, auth_manager, validate
 )
 from ...container import container
+from ...models import Device
 from structlog import get_logger
 
 logger = get_logger()
@@ -11,58 +12,59 @@ devices = Blueprint('devices', __name__, url_prefix='/api/devices')
 
 
 def index():
-    devices = container.repositories.devices.all()
+    devices = container.account.devices.all()
 
-    return jsonify(dict(devices=devices))
+    return dict(devices=devices)
 
 
 def view(id):
 
-    device = container.repositories.devices.first(id=id)
+    device = container.account.devices.first(id=id)
 
     if not device:
-        pass
+        return dict(), 404
 
-    return jsonify(dict(device=device))
+    return dict(device=device)
 
 
 def create():
-    devices = container.repositories.devices
 
-    device = devices.new()
+    device = Device()
     device.name = request.data.name
 
-    devices.save(device)
+    container.account.devices.append(device)
+    container.database.commit()
 
-    return jsonify(dict(device=device)), 204
+    return dict(device=device), 204
 
 
 def update(id):
-    devices = container.repositories.devices
+    devices = container.account.devices
 
-    device = devices.first(id=id)
+    device = devices.filter_by(id=id).first()
 
-    if not device:
-        return jsonify(dict()), 404
+    if not device or device.is_deleted:
+        return dict(), 404
 
     device.name = request.data.name
     device.door_id = request.data.door_id
 
-    devices.save(device)
+    container.database.commit()
 
-    return jsonify(dict(device=device))
+    return dict(device=device)
 
 
 def delete(id):
 
-    device = container.repositories.devices
+    device = container.account.devices.filter_by(id=id).first()
 
-    if not device:
-        pass
+    if not device or device.is_deleted:
+        return dict(), 404
 
-    devices.delete(device)
+    device.is_deleted = True
+    container.database.commit()
 
-    return jsonify(dict()), 200
+    return dict(), 200
 
 
 devices.add_url_rule(
@@ -70,7 +72,9 @@ devices.add_url_rule(
 )
 
 devices.add_url_rule(
-    '', 'create', s(auth_manager, create), methods=['POST']
+    '', 'create',
+    s(auth_manager, validate('device_create'), create),
+    methods=['POST']
 )
 
 devices.add_url_rule(
@@ -81,7 +85,7 @@ devices.add_url_rule(
 
 devices.add_url_rule(
     '/<int:id>', 'update',
-    s(auth_manager, update),
+    s(auth_manager, validate('device_update'), update),
     methods=['PUT']
 )
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
 from .security.policies import (
     AdministratorPolicy, get_policy_for_person
 )
+from structlog import get_logger
+logger = get_logger()
 
-logger = logging.getLogger(__name__)
 
 AUTHORIZATION_GATEKEEPER = 'gatekeeper'
 AUTHORIZATION_PERSON = 'person'
@@ -50,7 +50,7 @@ def parse_token_authorization(authorization):
 
     if not authorization:
         logger.info(
-            '{method} missing authorization header',
+            'missing authorization header',
             module=__name__,
             method='parse_token_authorization'
         )
@@ -59,7 +59,7 @@ def parse_token_authorization(authorization):
     parts = authorization.split(' ')
     if len(parts) != 2:
         logger.info(
-            '{method} invalid authorization header',
+            'invalid authorization header',
             module=__name__,
             method='parse_token_authorization'
         )

@@ -26,7 +26,7 @@ class Accounts(Service):
             host = self._generate_host(data['host'])
 
             if not host:
-                return AccountCreatedResult(account=None, error="")
+                return AccountCreatedResult(account=None, error="host taken")
 
             data['host'] = host
 

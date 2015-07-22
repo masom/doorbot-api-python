@@ -1,8 +1,10 @@
-from flask import Blueprint, jsonify, request
-from ...container import container
-from ...middlewares import (
-    m, auth_admin, auth_secured
+from flask import (
+    abort, Blueprint, request, render_template, redirect, url_for
 )
+from ...models import Account
+from ...db import db
+from .forms import AccountCreateForm, AccountUpdateForm
+
 
 accounts = Blueprint('accounts', __name__, url_prefix='/accounts')
 
@@ -27,55 +29,65 @@ class PublicAccount(object):
 
 
 def index():
-    repositories = container.repositories
-
     accounts = [
         PublicAccount.from_account(account).to_dict()
-        for account in repositories.accounts.all()
+        for account in db.query(Account).filter_by(is_deleted=False).all()
     ]
 
-    return jsonify(dict(
+    return render_template(
+        'accounts/index',
         accounts=accounts
-    ))
+    )
 
 
 def create():
+    form = AccountCreateForm(request.form)
 
-    services = container.services
-    result = services.accounts.register(request.data)
+    if request.method == 'POST' and form.validate():
+        account = Account()
+        account.contact_name = form.contact_name.data
+        account.contact_email = form.contact_email.data
 
-    if result.get('error', False):
-        return jsonify(dict()), 500
+        db.add(account)
+        db.commit()
 
-    return jsonify(dict(
-        account=result.get('account', None)
-    ))
+        return redirect(url_for('.index'))
+
+    return render_template(
+        'accounts/create',
+        form=form
+    )
 
 
 def update(id):
 
-    account = container.repositories.accounts.first(id=id)
+    account = db.query(Account).filter_by(id=id, is_deleted=False).first()
 
     if not account:
-        pass
+        return abort(404)
 
-    container.services.accounts.update(account)
+    form = AccountUpdateForm(request.form)
+    if request.method == 'POST' and form.validate():
+        account.contact_name = form.contact_name.data
 
-    return jsonify(dict(
-        account=account
-    ))
+        db.commit()
+
+    return render_template(
+        'accounts/update',
+        form=form
+    )
 
 accounts.add_url_rule(
-    '', 'index', m(auth_secured, auth_admin, index),
+    '', 'index', index,
     methods=['GET']
 )
 
 accounts.add_url_rule(
-    '', 'create', m(auth_secured, auth_admin, create),
+    '', 'create', create,
     methods=['POST']
 )
 
 accounts.add_url_rule(
-    '/<int:id>', 'update', m(auth_secured, auth_admin, update),
+    '/<int:id>', 'update', update,
     methods=['PUT']
 )

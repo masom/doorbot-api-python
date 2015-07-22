@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ..midlewares import(
-    s, auth_manager
+    s, auth_manager, validate
 )
 from ...container import container
 
@@ -11,57 +11,56 @@ doors = Blueprint('doors', __name__, url_prefix='/api/doors')
 
 
 def index():
-    doors = container.repositories.doors.all()
+    doors = container.account.doors.all()
 
-    return jsonify(dict(doors=doors))
+    return dict(doors=doors)
 
 
 def view(id):
 
-    door = container.repositories.doors.first(id=id)
+    door = container.account.doors.filter_by(id=id, is_deleted=False).first()
 
     if not door:
         pass
 
-    return jsonify(dict(door=door))
+    return dict(door=door)
 
 
 def create():
-    doors = container.repositories.doors
+    doors = container.account.doors
 
     door = doors.new()
     door.name = request.data.name
+    doors.append(door)
 
-    doors.save(door)
+    container.database.commit()
 
-    return jsonify(dict(door=door)), 204
+    return dict(door=door), 204
 
 
 def update(id):
-    doors = container.repositories.doors
-
-    door = doors.first(id=id)
+    door = container.account.doors.filter_by(id=id, is_deleted=False).first()
 
     if not door:
-        return jsonify(dict()), 404
+        return dict(), 404
 
     door.name = request.data.name
+    container.database.commit()
 
-    doors.save(door)
-
-    return jsonify(dict(door=door))
+    return dict(door=door)
 
 
 def delete(id):
 
-    door = container.repositories.doors
+    door = container.account.doors.filter_by(id=id, is_deleted=False).first()
 
     if not door:
-        pass
+        return dict(), 404
 
-    doors.delete(door)
+    container.database.delete(door)
+    container.database.commit()
 
-    return jsonify(dict()), 200
+    return dict(), 200
 
 
 doors.add_url_rule(
@@ -69,7 +68,9 @@ doors.add_url_rule(
 )
 
 doors.add_url_rule(
-    '', 'create', s(auth_manager, create), methods=['POST']
+    '', 'create',
+    s(auth_manager, validate('door_create'), create),
+    methods=['POST']
 )
 
 doors.add_url_rule(
@@ -80,7 +81,7 @@ doors.add_url_rule(
 
 doors.add_url_rule(
     '/<int:id>', 'update',
-    s(auth_manager, update),
+    s(auth_manager, validate('door_update'), update),
     methods=['PUT']
 )
 

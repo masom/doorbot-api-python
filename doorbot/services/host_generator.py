@@ -2,6 +2,7 @@
 
 from ..core.service import Service
 from ..security import generate_random_string
+from ..models import Account
 
 
 class HostGenerator(Service):
@@ -10,12 +11,10 @@ class HostGenerator(Service):
     def random(self, length):
         '''Generate a random hostname'''
 
-        accounts = self._repositories.accounts
-
         for attempt in xrange(10):
             tmp = generate_random_string(length).lower()
 
-            exists = accounts.first(dict(host=tmp))
+            exists = self.database.query(Account).filter_by(host=tmp).first()
             if exists:
                 continue
 

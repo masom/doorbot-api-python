@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ...middlewares import (
     s, auth_manager, validate
 )
@@ -32,70 +32,74 @@ class PublicPerson(object):
 
 
 def index():
-    people = container.repositories.people.all()
+    people = container.account.people.all()
 
     authorization = container.authorization
 
     if authorization.is_administrator():
-        return jsonify(dict(people=people))
+        return dict(people=people)
 
-    return jsonify(dict(
+    return dict(
         people=[
             PublicPerson.from_person(person).to_dict()
             for person in people
         ]
-    ))
+    )
 
 
 def view(id):
-    person = container.repositories.people.first(id=id)
+    person = container.account.people.filter_by(id=id, is_deleted=False).first()
 
     if not person:
-        return jsonify(dict()), 404
+        return dict(), 404
 
-    return jsonify(dict(person=person))
+    return dict(person=person)
 
 
 def create():
-    people = container.repositories.people
+    people = container.account.people
 
     person = people.new()
     person.name = request.data.name
     person.title = request.data.title
     person.phone_number = request.data.phone_number
 
-    people.save(person)
+    people.append(person)
 
-    return jsonify(dict(person=person)), 204
+    container.database.commit()
+
+    return dict(person=person), 204
 
 
 def update(id):
-    people = container.repositories.people
-    person = people.first(id=id)
+    people = container.account.people
+    person = people.filter_by(id=id, is_deleted=False)
 
     if not person.can_be_edited_by(container.authorization):
-        return jsonify(dict()), 403
+        return dict(), 403
 
     person.name = request.data.name
     person.phone_number = request.data.phone_number
     person.title = request.data.title
 
-    people.update(person)
-    return jsonify(dict(person=person))
+    container.database.commit()
+
+    return dict(person=person)
 
 
 def delete(id):
 
-    people = container.repositories.people
+    people = container.account.people
 
-    person = people.first(id=id)
+    person = people.filter_by(id=id, is_deleted=False)
 
     if not person:
-        return jsonify(dict()), 404
+        return dict(), 404
 
-    people.delete(person)
+    container.database.delete(person)
+    container.database.commit()
 
-    return jsonify(dict()), 201
+    return dict(), 201
 
 
 def sync():

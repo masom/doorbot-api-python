@@ -81,7 +81,7 @@ class Auth(Service):
         parts = token.split(".")
         if len(parts) != 2:
             logger.warning(
-                '{module} invalid person token'.format(module=__name__),
+                'invalid person token',
                 account_id=self.account.id,
                 token=token,
                 module=__name__
@@ -93,7 +93,7 @@ class Auth(Service):
             person_id = int(parts[0], 10)
         except ValueError:
             logger.warning(
-                '{module} invalid person id in token'.format(module=__name__),
+                'invalid person id in token',
                 account_id=self.account.id,
                 token=token,
                 module=__name__
@@ -112,7 +112,7 @@ class Auth(Service):
 
         if not auth:
             logger.info(
-                '{module} authentication not found'.format(module=__name__),
+                'person authentication not found',
                 account_id=self.account.id,
                 token=token,
                 module=__name__
@@ -120,12 +120,29 @@ class Auth(Service):
 
             return False
 
+        if auth.person.is_deleted:
+            logger.info(
+                'unauthorized due to person deleted',
+                account_id=self.account.id,
+                person_id=auth.person.id
+            )
+
+            return False
+
         return auth.person
 
     def person_with_password(self, email, password):
-        person = self.account.people.filter_by(email=email).first()
+        person = self.account.people.filter_by(
+            email=email,
+            is_deleted=False
+        ).first()
 
         if not person:
+            logger.info(
+                'person not found',
+                person_email=email,
+                account_id=self.account.id
+            )
             return False
 
         auth = person.authentications.filter_by(
@@ -158,16 +175,17 @@ class Auth(Service):
 
                 self.database.commit()
             except Exception as e:
+                import traceback
                 logger.error(
-                    '{module} api token creation error'.format(
-                        module=__name__
-                    ),
+                    'person api token creation error',
                     module=__name__,
                     account_id=self.account.id,
                     person_id=person.id,
-                    provider_id=PROVIDER_PASSWORD
+                    provider_id=PROVIDER_PASSWORD,
+                    trace=traceback.format_exc()
                 )
 
+                self.database.rollback()
                 raise e
 
         return dict(person=person, auth=token_auth)

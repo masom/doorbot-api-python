@@ -15,18 +15,18 @@ def password():
         authentication['email'], authentication['password']
     )
 
-    if result.get('error', False):
+    if not result:
         return dict(), 401
 
     return dict(
         authentication=dict(
             token="{person_id}.{token}".format(
-                person_id=result.person.id,
-                token=result.auth.token
+                person_id=result['person'].id,
+                token=result['auth'].token
             )
         ),
-        person=result.person,
-        policy=get_policy_for_person(result.person)
+        person=result['person'],
+        policy=get_policy_for_person(result['person'])
     )
 
 
@@ -60,8 +60,6 @@ def token():
         )
     else:
         return {}, 401
-
-
 
 
 auth.add_url_rule(

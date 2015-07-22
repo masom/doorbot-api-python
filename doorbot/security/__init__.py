@@ -8,7 +8,7 @@ safe_string_letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'
 
 
 def generate_api_token():
-    return uuid.uuid4().hex()
+    return str(uuid.uuid4())
 
 
 def generate_password(length):

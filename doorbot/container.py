@@ -18,7 +18,7 @@ class Container(object):
     def set_account(self, account):
         ctx = stack.top
         if ctx is None:
-            return None
+            raise RuntimeError('Missing app context')
 
         ctx.doorbot_account = account
 
@@ -66,7 +66,7 @@ class Container(object):
             return None
 
         if not hasattr(ctx, 'doorbot_services'):
-            ctx.doorbot_services = Services(self.database)
+            ctx.doorbot_services = Services(self.database, self.account)
 
         return ctx.doorbot_services
 

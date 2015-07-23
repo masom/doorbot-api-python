@@ -21,16 +21,20 @@ class SubdomainDispatcher(object):
         :type debug: boolean
         '''
 
-        self.apps = {
-            'admin': create_admin_app(config),
-            'api': create_api_app(config),
-            'public': create_public_app(config)
-        }
-
-        for name, app in self.apps.iteritems():
-            app.debug = debug
-
+        self.config = config
+        self.factories = {}
+        self.apps = {}
         self.domain = domain
+        self.debug = debug
+
+    def add_app_factory(self, name, factory):
+        self.factories[name] = factory
+
+    def initialize(self):
+
+        for name, factory in self.factories.items():
+            self.apps[name] = factory(self.config)
+            self.apps[name].debug = self.debug
 
     def get_application(self, environ):
         """Get the proper application for the given http environment

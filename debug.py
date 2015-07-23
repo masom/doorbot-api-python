@@ -2,6 +2,9 @@
 
 from werkzeug.serving import run_simple
 from doorbot.factory import SubdomainDispatcher
+from doorbot.factory import (
+    create_api_app, create_admin_app, create_public_app
+)
 import logging
 import structlog
 import sys
@@ -33,6 +36,11 @@ application = SubdomainDispatcher(
     config='../config_debug.py',
     debug=True
 )
+
+application.add_app_factory('admin', create_admin_app)
+application.add_app_factory('api', create_api_app)
+application.add_app_factory('public', create_public_app)
+application.initialize()
 
 run_simple('localhost', 5000, application,
            use_reloader=True, use_debugger=True, use_evalex=True)

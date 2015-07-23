@@ -6,6 +6,7 @@ from .container import container
 from .db import db
 from .schema_validator import jsonschema
 from .sessions import ItsdangerousSessionInterface
+from .views.api.lib.json_serializer import ApiJsonEncoder
 
 
 class SubdomainDispatcher(object):
@@ -111,6 +112,7 @@ def create_api_app(config=None):
 
     from .views.api import (accounts, auth, people)
 
+    app.json_encoder = ApiJsonEncoder
     app.register_blueprint(auth)
     app.register_blueprint(accounts)
     app.register_blueprint(people)

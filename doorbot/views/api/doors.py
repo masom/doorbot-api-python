@@ -5,6 +5,7 @@ from ..midlewares import(
     s, auth_manager, validate
 )
 from ...container import container
+from .view_models import PublicDoor, Door as DoorViewModel
 
 
 doors = Blueprint('doors', __name__, url_prefix='/api/doors')
@@ -13,7 +14,7 @@ doors = Blueprint('doors', __name__, url_prefix='/api/doors')
 def index():
     doors = container.account.doors.all()
 
-    return dict(doors=doors)
+    return dict(doors=[DoorViewModel.from_door(door) for door in doors])
 
 
 def view(id):
@@ -21,9 +22,9 @@ def view(id):
     door = container.account.doors.filter_by(id=id, is_deleted=False).first()
 
     if not door:
-        pass
+        return dict(), 404
 
-    return dict(door=door)
+    return dict(door=DoorViewModel.from_door(door))
 
 
 def create():
@@ -35,7 +36,7 @@ def create():
 
     container.database.commit()
 
-    return dict(door=door), 204
+    return dict(door=DoorViewModel.from_door(door)), 204
 
 
 def update(id):
@@ -47,7 +48,7 @@ def update(id):
     door.name = request.data.name
     container.database.commit()
 
-    return dict(door=door)
+    return dict(door=DoorViewModel.form_door(door))
 
 
 def delete(id):

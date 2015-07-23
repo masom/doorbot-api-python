@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ..midlewares import(
     s, validate
 )
 from ...container import container
-
+from .view_models import Notification as NotificationViewModel
 
 notifications = Blueprint(
     'notifications', __name__, prefix='/api/notifications'
@@ -23,9 +23,11 @@ def notify():
     if not person:
         return dict(), 422
 
-    container.services.notifications.knock_knock(person, door)
+    notification = container.services.notifications.knock_knock(person, door)
 
-    return jsonify(dict()), 204
+    return dict(
+        notifiation=NotificationViewModel.from_notification(notification)
+    ), 204
 
 
 notifications.add_url_rule(

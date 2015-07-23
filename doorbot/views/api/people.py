@@ -3,32 +3,9 @@ from ...middlewares import (
     s, auth_manager, validate
 )
 from ...container import container
-
+from .view_models import PublicPerson, Person as PersonViewModel
 
 people = Blueprint('people', __name__, url_prefix='/api/people')
-
-
-class PublicPerson(object):
-    def __init__(self, id, name, email, is_available):
-        self.id = id
-        self.name = name
-        self.email = email
-        self.is_available = is_available
-
-    def to_dict(self):
-        return dict(
-            id=self.id, name=self.name, email=self.email,
-            is_available=self.is_available
-        )
-
-    @classmethod
-    def from_person(cls, person):
-        return cls(
-            id=person.id,
-            name=person.name,
-            email=person.email,
-            is_available=person.is_available
-        )
 
 
 def index():
@@ -48,12 +25,14 @@ def index():
 
 
 def view(id):
-    person = container.account.people.filter_by(id=id, is_deleted=False).first()
+    person = container.account.people.filter_by(
+        id=id, is_deleted=False
+    ).first()
 
     if not person:
         return dict(), 404
 
-    return dict(person=person)
+    return dict(person=PersonViewModel.from_person(person))
 
 
 def create():
@@ -68,7 +47,7 @@ def create():
 
     container.database.commit()
 
-    return dict(person=person), 204
+    return dict(person=PersonViewModel.from_person(person)), 204
 
 
 def update(id):
@@ -84,7 +63,7 @@ def update(id):
 
     container.database.commit()
 
-    return dict(person=person)
+    return dict(person=PersonViewModel.from_person(person))
 
 
 def delete(id):

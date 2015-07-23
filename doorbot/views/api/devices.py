@@ -5,6 +5,7 @@ from ...middlewares import(
 from ...container import container
 from ...models import Device
 from structlog import get_logger
+from .view_models import Device as DeviceViewModel
 
 logger = get_logger()
 
@@ -24,7 +25,7 @@ def view(id):
     if not device:
         return dict(), 404
 
-    return dict(device=device)
+    return dict(device=DeviceViewModel.from_device(device))
 
 
 def create():
@@ -35,7 +36,7 @@ def create():
     container.account.devices.append(device)
     container.database.commit()
 
-    return dict(device=device), 204
+    return dict(device=DeviceViewModel.from_device(device)), 204
 
 
 def update(id):
@@ -51,7 +52,7 @@ def update(id):
 
     container.database.commit()
 
-    return dict(device=device)
+    return dict(device=DeviceViewModel.from_device(device))
 
 
 def delete(id):

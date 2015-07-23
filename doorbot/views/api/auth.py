@@ -3,6 +3,7 @@ from ...container import container
 from ...security.policies import get_policy_for_person
 from ...middlewares import (m, account_scope, validate)
 from ...auth import AUTHORIZATION_DEVICE, AUTHORIZATION_PERSON
+from .view_models import Person as PersonViewModel
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -25,7 +26,7 @@ def password():
                 token=result['auth'].token
             )
         ),
-        person=result['person'],
+        person=PersonViewModel.from_person(result['person']),
         policy=get_policy_for_person(result['person'])
     )
 

@@ -11,9 +11,6 @@ from .integrations import available_integrations
 class Account(DeclarativeBase):
     __tablename__ = 'accounts'
 
-    TYPE_MEMBER = 1
-    TYPE_MANAGER = 2
-    TYPE_OWNER = 3
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)

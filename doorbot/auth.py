@@ -45,6 +45,22 @@ class Authorization(object):
         self.person = None
         self.policy = None
 
+    def is_person(self):
+        return self.type == AUTHORIZATION_PERSON or \
+            self.type == AUTHORIZATION_ADMINISTRATOR
+
+    def is_administrator(self):
+        return self.type == AUTHORIZATION_ADMINISTRATOR
+
+    def is_account_manager(self):
+        if self.is_administrator():
+            return True
+
+        if not self.is_person():
+            return False
+
+        return self.person.is_account_manager()
+
 
 def parse_token_authorization(authorization):
 

@@ -13,12 +13,14 @@ def index():
 
     authorization = container.authorization
 
-    if authorization.is_administrator():
-        return dict(people=people)
+    if authorization.is_account_manager():
+        return dict(
+            people=[PersonViewModel.from_person(person) for person in people]
+        )
 
     return dict(
         people=[
-            PublicPerson.from_person(person).to_dict()
+            PublicPerson.from_person(person)
             for person in people
         ]
     )

@@ -144,7 +144,7 @@ class Accounts(Service):
         person = Person()
         person.name = data['contact_name']
         person.email = data['contact_email']
-        person.account_type = account.TYPE_OWNER
+        person.account_type = person.TYPE_OWNER
 
         account.people.append(person)
 

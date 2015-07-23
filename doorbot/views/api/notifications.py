@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, request
-from ..midlewares import(
+from ...middlewares import(
     s, validate
 )
 from ...container import container
 from .view_models import Notification as NotificationViewModel
 
 notifications = Blueprint(
-    'notifications', __name__, prefix='/api/notifications'
+    'notifications', __name__, url_prefix='/api/notifications'
 )
 
 

@@ -10,6 +10,10 @@ from ..core.model import DeclarativeBase
 class Person(DeclarativeBase):
     __tablename__ = 'people'
 
+    TYPE_MEMBER = 1
+    TYPE_MANAGER = 2
+    TYPE_OWNER = 3
+
     id = Column(Integer, primary_key=True)
 
     account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
@@ -40,7 +44,8 @@ class Person(DeclarativeBase):
     updated_at = Column(DateTime, nullable=True)
 
     def is_account_manager(self):
-        return False
+        return self.account_type == self.TYPE_OWNER or \
+            self.account_type == self.TYPE_MANAGER
 
     def is_account_owner(self):
-        return False
+        return self.account_type == self.TYPE_OWNER

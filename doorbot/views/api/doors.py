@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, request
-from ..midlewares import(
+from ...middlewares import(
     s, auth_manager, validate
 )
 from ...container import container
-from .view_models import PublicDoor, Door as DoorViewModel
+from .view_models import Door as DoorViewModel
 
 
-doors = Blueprint('doors', __name__, url_prefix='/api/doors')
+doors = Blueprint(
+    'doors', __name__, url_prefix='/api/doors'
+)
 
 
 def index():

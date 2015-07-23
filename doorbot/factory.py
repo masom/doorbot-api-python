@@ -110,11 +110,16 @@ def create_api_app(config=None):
     db.init_app(app)
     container.init_app(app)
 
-    from .views.api import (accounts, auth, people)
+    from .views.api import (
+        accounts, auth, devices, doors, notifications, people
+    )
 
     app.json_encoder = ApiJsonEncoder
     app.register_blueprint(auth)
     app.register_blueprint(accounts)
+    app.register_blueprint(devices)
+    app.register_blueprint(doors)
+    app.register_blueprint(notifications)
     app.register_blueprint(people)
 
     return app

@@ -65,7 +65,7 @@ def m(*mw):
     return wrapped
 
 
-def account_scope():
+def account_scope(*args, **kwargs):
     account = container.database.query(Account).filter_by(
         host=request.environ['DOORBOT_ACCOUNT_HOST']
     ).first()
@@ -75,7 +75,7 @@ def account_scope():
     container.set_account(account)
 
 
-def auth_admin():
+def auth_admin(*args, **kwargs):
     if container.authorization.is_administrator():
         return
 
@@ -86,7 +86,7 @@ def auth_gatekeeper():
     pass
 
 
-def auth_owner():
+def auth_owner(*args, **kwargs):
     authorization = container.authorization
 
     if authorization.is_person() and authorization.person.is_account_owner():
@@ -95,7 +95,7 @@ def auth_owner():
     return dict(), 403
 
 
-def auth_secured():
+def auth_secured(*args, **kwargs):
     (mode, token) = auth.parse_token_authorization(
         request.headers.get('Authorization', None)
     )
@@ -151,7 +151,7 @@ def auth_secured():
         return dict(), 401
 
 
-def auth_manager():
+def auth_manager(*args, **kwargs):
     authorization = container.authorization
 
     if authorization.is_person() and authorization.person.is_account_manager():

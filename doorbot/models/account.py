@@ -30,7 +30,9 @@ class Account(DeclarativeBase):
 
     devices = relationship("Device", lazy="dynamic")
     doors = relationship("Door", lazy="dynamic")
-    integrations = relationship("Integration", lazy="dynamic")
+    integrations = relationship(
+        "Integration", lazy="dynamic",  enable_typechecks=False
+    )
     notifications = relationship("Notification", lazy="dynamic")
     people = relationship("Person", lazy="dynamic", backref='account')
     service_users = relationship("ServiceUser", lazy="dynamic")

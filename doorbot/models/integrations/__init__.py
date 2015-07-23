@@ -17,3 +17,14 @@ available_integrations = [
     Slack,
     Twilio
 ]
+
+
+def polymorph_integration(integration):
+
+    for cls in available_integrations:
+        if integration.name == cls.name:
+            return cls.polymorph(integration)
+
+    raise RuntimeError(
+        "Integration {name} is not available".format(name=integration.name)
+    )

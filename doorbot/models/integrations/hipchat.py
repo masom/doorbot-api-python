@@ -17,6 +17,11 @@ class HipChat(Integration):
     can_notify_users = True
     can_sync_users = True
 
+    __mapper_args__ = {
+        'polymorphic_identity': name,
+        'polymorphic_on': Integration.integration_name
+    }
+
     def notify_user(self, notification):
         pass
 

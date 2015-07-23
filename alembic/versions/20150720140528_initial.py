@@ -53,8 +53,9 @@ def upgrade():
     )
 
     op.create_table(
-        'account_integrations',
+        'integrations',
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('account_integrations', sa.String(), nullable=False),
         sa.Column('account_id', sa.Integer(), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
         sa.Column('properties', sa.Text(), nullable=True),
@@ -63,6 +64,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
+
     op.create_table(
         'administrator_authentications',
         sa.Column('id', sa.Integer(), nullable=False),

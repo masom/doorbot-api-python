@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, Boolean, DateTime
+from sqlalchemy import Column, Integer, Boolean, DateTime, String, event
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import reconstructor
 
@@ -10,7 +10,10 @@ from ...core.model import DeclarativeBase, MutableDict, JsonType
 class Integration(DeclarativeBase):
     __tablename__ = 'account_integrations'
 
+    __properties__ = []
+
     id = Column(Integer, primary_key=True)
+    integration_name = Column(String, nullable=False)
     account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
     is_active = Column(Boolean, default=False, nullable=False)
 
@@ -21,11 +24,16 @@ class Integration(DeclarativeBase):
 
     title = ""
     description = ""
-    name = ""
+    name = "unknown"
 
     can_notify_users = False
     can_notify_group = False
     can_sync_users = False
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'unknown',
+        'polymorphic_on': integration_name
+    }
 
     @reconstructor
     def reconstructor(self):
@@ -49,15 +57,15 @@ class Integration(DeclarativeBase):
 
     def __getattr__(self, attr):
 
-        if attr not in self.__properties__:
-            raise AttributeError(
-                'Attribute `{attr}` does not exists'.format(attr=attr)
-            )
-
-        value = self.properties.get(attr, None)
-        if value:
-            return value
+        if attr in self.__properties__:
+            return self.properties.get(attr, None)
 
         raise AttributeError(
             'Attribute `{attr}` does not exists'.format(attr=attr)
         )
+
+
+def before_insert(mapper, connection, target):
+    target.integration_name = target.name
+
+event.listen(Integration, 'before_insert', before_insert)

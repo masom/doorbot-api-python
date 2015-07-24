@@ -11,7 +11,6 @@ from .integrations import available_integrations
 class Account(DeclarativeBase):
     __tablename__ = 'accounts'
 
-
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
@@ -31,7 +30,7 @@ class Account(DeclarativeBase):
     devices = relationship("Device", lazy="dynamic")
     doors = relationship("Door", lazy="dynamic")
     integrations = relationship(
-        "Integration", lazy="dynamic",  enable_typechecks=False
+        "Integration", lazy="dynamic"
     )
     notifications = relationship("Notification", lazy="dynamic")
     people = relationship("Person", lazy="dynamic", backref='account')

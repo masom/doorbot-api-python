@@ -13,7 +13,7 @@ log = get_logger()
 
 def _log_unauthorized_access(**context):
     context['module'] = __name__
-    log.info("{method} unauthorized access", context)
+    log.info("unauthorized access", context=context)
 
 
 def handle_response(rv):

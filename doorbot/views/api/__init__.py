@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .accounts import accounts
+from .account import bp as account
 from .auth import auth
 from .people import people
 from .devices import devices

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 # import requests
 
 
-class Hub(Integration):
-    __properties__ = [
+class Hub(IntegrationInterface):
+    properties = [
         'token', 'server'
     ]
 

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 
 
-class Postmark(Integration):
-    __properties__ = [
+class Postmark(IntegrationInterface):
+    properties = [
         'token'
     ]
 
-    name="postmark"
+    name = "postmark"
     title = "Postmark"
     description = "ransactional Email Delivery"
     url = "https://postmarkapp.com/"

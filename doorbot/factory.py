@@ -111,12 +111,12 @@ def create_api_app(config=None):
     container.init_app(app)
 
     from .views.api import (
-        accounts, auth, devices, doors, integrations, notifications, people
+        account, auth, devices, doors, integrations, notifications, people
     )
 
     app.json_encoder = ApiJsonEncoder
     app.register_blueprint(auth)
-    app.register_blueprint(accounts)
+    app.register_blueprint(account)
     app.register_blueprint(devices)
     app.register_blueprint(doors)
     app.register_blueprint(integrations)

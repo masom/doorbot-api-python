@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 
 
-class Nexmo(Integration):
-    __properties__ = [
+class Nexmo(IntegrationInterface):
+    properties = [
         'token'
     ]
 

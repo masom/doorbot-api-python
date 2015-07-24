@@ -55,7 +55,7 @@ def upgrade():
     op.create_table(
         'integrations',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('account_integrations', sa.String(), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
         sa.Column('account_id', sa.Integer(), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
         sa.Column('properties', sa.Text(), nullable=True),

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 
 
-class Slack(Integration):
-    __properties__ = [
+class Slack(IntegrationInterface):
+    properties = [
         'token', 'room', 'server'
     ]
 

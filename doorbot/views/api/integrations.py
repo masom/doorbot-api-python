@@ -4,10 +4,7 @@ from flask import Blueprint, request
 from ...container import container
 from ...middlewares import (s, validate, auth_manager)
 from .view_models import Integration as IntegrationViewModel
-from ...models.integrations import (
-    available_integrations, polymorph_integration
-)
-
+from ...models import Integration
 
 integrations = Blueprint(
     'integrations', __name__, url_prefix='/api/integrations'
@@ -20,9 +17,7 @@ def index():
 
     return dict(
         integrations=[
-            IntegrationViewModel.from_integration(
-                polymorph_integration(integration)
-            )
+            IntegrationViewModel.from_integration(integration)
             for integration in integrations
         ]
     )
@@ -31,23 +26,17 @@ def index():
 def create():
     json = request.get_json()
 
-    instance = None
-    for integration in available_integrations:
-        if integration.name == json['integration']['name']:
-            instance = integration()
-            break
-
-    if not instance:
+    instance = Integration(json['integration']['name'])
+    if not instance.adapter:
         return dict(), 400
 
     instance.properties = {}
     for name, value in json['integration'].items():
-        if name not in integration.__properties__:
+        if name not in instance.adapter.properties:
             continue
 
         instance.properties[name] = value
 
-    instance.name = integration.name
     instance.is_active = json['integration'].get('is_active', False)
     container.account.integrations.append(instance)
     container.database.commit()

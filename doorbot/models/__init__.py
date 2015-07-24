@@ -5,6 +5,7 @@ from ..core.model import Base
 from .account import Account
 from .administrator import Administrator
 from .administrator_authentication import AdministratorAuthentication
+from .integration import Integration
 from .device import Device
 from .door import Door
 from .notification import Notification

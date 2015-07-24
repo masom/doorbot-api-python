@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 
 
-class Twilio(Integration):
-    __properties__ = [
+class Twilio(IntegrationInterface):
+    properties = [
         'token', 'phone_number'
     ]
 

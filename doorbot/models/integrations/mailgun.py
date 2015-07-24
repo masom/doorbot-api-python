@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .integration import Integration
+from .integration import IntegrationInterface
 
 
-class Mailgun(Integration):
-    __properties__ = [
+class Mailgun(IntegrationInterface):
+    properties = [
         'token'
     ]
 

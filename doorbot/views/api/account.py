@@ -7,7 +7,7 @@ from ...middlewares import (
 )
 from .view_models import PublicAccount, Account as AccountViewModel
 
-accounts = Blueprint('account', __name__, url_prefix='/api/account')
+bp = Blueprint('account', __name__, url_prefix='/api/account')
 
 
 def view():
@@ -45,12 +45,12 @@ def update():
         account=AccountViewModel.from_account(account)
     )
 
-accounts.add_url_rule(
+bp.add_url_rule(
     '', 'view', s(view),
     methods=['GET']
 )
 
-accounts.add_url_rule(
+bp.add_url_rule(
     '', 'update',
     s(auth_owner, validate('account_update'), update),
     methods=['PUT']

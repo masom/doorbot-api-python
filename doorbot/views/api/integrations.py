@@ -25,9 +25,14 @@ def index():
 
 def create():
     json = request.get_json()
+    account = container.account
 
     instance = Integration(json['integration']['name'])
     if not instance.adapter:
+        return dict(), 400
+
+    exists = account.integrations.filter_by(name=instance.name).first()
+    if exists and exists.allow_multiple is False:
         return dict(), 400
 
     instance.properties = {}

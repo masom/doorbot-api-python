@@ -7,6 +7,7 @@ from .nexmo import Nexmo
 from .postmark import Postmark
 from .slack import Slack
 from .twilio import Twilio
+from .webhook import Webhook
 
 available_integrations = [
     HipChat,
@@ -15,5 +16,6 @@ available_integrations = [
     Nexmo,
     Postmark,
     Slack,
-    Twilio
+    Twilio,
+    Webhook
 ]

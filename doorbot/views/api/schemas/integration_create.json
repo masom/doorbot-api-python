@@ -5,7 +5,9 @@
         "integration":{
             "properties":{
                 "is_active": { "type": "boolean" },
-                "name": { "type": "string" }
+                "name": { "enum": [
+                    "hipchat", "hub", "mailgun", "nexmo", "postmark", "slack", "twilio"
+                ] }
             },
             "required": ["name"],
             "additionalProperties": true

@@ -9,6 +9,7 @@ class IntegrationInterface(object):
     description = ""
     url = ""
 
+    allow_multiple = False
     can_notify_users = False
     can_notify_group = False
     can_sync_users = False

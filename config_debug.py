@@ -8,3 +8,5 @@ SQLALCHEMY_ECHO = True
 
 if not SQLALCHEMY_DATABASE_URI:
     raise ValueError("DOORBOT_DATABASE_URL must be set")
+
+CELERY_ACCEPT_CONTENT = ['json']

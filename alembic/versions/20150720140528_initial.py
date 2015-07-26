@@ -242,7 +242,7 @@ def upgrade():
         ['account_id']
     )
     op.create_index(
-        'unique_service_user_on_service_users', 'service_users',
+        'unique_service_user_per_account_on_service_users', 'service_users',
         ['account_id', 'service', 'service_user_id'],
         unique=True
     )

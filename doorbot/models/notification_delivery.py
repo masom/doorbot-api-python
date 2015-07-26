@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from sqlalchemy import (
-    Column, DateTime, Integer, ForeignKey, Text, Enum
+    Column, DateTime, Integer, ForeignKey, Text, Enum, Index
 )
 from ..core.model import DeclarativeBase, JobStatuses
 
@@ -24,8 +24,13 @@ class NotificationDelivery(DeclarativeBase):
     response = Column(Text)
 
     status = Column(
-        Enum(*JobStatuses.to_list()), nullable=False,
+        Enum(*JobStatuses.to_list(), name="job_statuses"), nullable=False,
         default=JobStatuses.PENDING
     )
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+Index(
+    'account_id_on_notification_deliveriess', NotificationDelivery.account_id
+)

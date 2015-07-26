@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from ..core.model import DeclarativeBase
 from .notification_delivery import NotificationDelivery
@@ -50,3 +50,5 @@ class Notification(DeclarativeBase):
 
             elif integration.can_notify_group:
                 pass
+
+Index('account_id_on_notifications', Notification.account_id)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum
+from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum, Index
 from ..core.model import DeclarativeBase, JobStatuses
 from ..jobs import SynchronizePeopleJob
 
@@ -13,7 +13,7 @@ class PeopleSynchronization(DeclarativeBase):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     status = Column(
-        Enum(*JobStatuses.to_list()), nullable=False,
+        Enum(*JobStatuses.to_list(), name="job_statuses"), nullable=False,
         default=JobStatuses.PENDING
     )
 
@@ -32,3 +32,7 @@ class PeopleSynchronization(DeclarativeBase):
 
         integration.synchronize_people()
         return True
+
+Index(
+    'account_id_on_people_synchronizations', PeopleSynchronization.account_id
+)

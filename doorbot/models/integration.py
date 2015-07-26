@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, Boolean, DateTime, String, event
+from sqlalchemy import (
+    Column, Integer, Boolean, DateTime, String, event, Index
+)
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import reconstructor
 
@@ -49,3 +51,5 @@ def before_insert(mapper, connection, target):
     target.name = target.adapter.name
 
 event.listen(Integration, 'before_insert', before_insert)
+
+Index('account_id_on_integrations', Integration.account_id)

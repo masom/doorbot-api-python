@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Index
 from sqlalchemy.orm import relationship
 
 from ..core.model import DeclarativeBase
@@ -46,3 +46,5 @@ class Account(DeclarativeBase):
         self.integrations.append(integration)
 
         return integration
+
+Index('unique_host_on_accounts', Account.host, unique=True)

@@ -1,7 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
 from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.orm.query import Query
 
 
 try:
@@ -66,4 +65,7 @@ class JobStatuses(object):
 
     @classmethod
     def to_list(cls):
-        return [cls.__dict__.values()]
+        return [
+            cls.PENDING, cls.SCHEDULED, cls.RUNNING, cls.FAILED, cls.SUCCESS,
+            cls.ERROR
+        ]

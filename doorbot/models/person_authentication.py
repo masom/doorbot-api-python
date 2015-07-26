@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import (
+    Boolean, Column, DateTime, Integer, String, ForeignKey, Index
+)
 from sqlalchemy import event
 from ..core.model import DeclarativeBase
 
@@ -30,3 +32,10 @@ def before_insert(mapper, connection, target):
     target.account_id = target.person.account_id
 
 event.listen(PersonAuthentication, 'before_insert', before_insert)
+
+Index('account_id_on_person_authentications', PersonAuthentication.account_id)
+Index(
+    'account_id_and_person_id_on_person_authentications',
+    PersonAuthentication.account_id,
+    PersonAuthentication.person_id
+)

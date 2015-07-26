@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import (
+    Boolean, Column, DateTime, Integer, String, ForeignKey, Index
+)
 from sqlalchemy.orm import relationship
 
 from ..core.model import DeclarativeBase
@@ -49,3 +51,9 @@ class Person(DeclarativeBase):
 
     def is_account_owner(self):
         return self.account_type == self.TYPE_OWNER
+
+Index('account_id_on_people', Person.account_id)
+Index(
+    'unique_email_per_account_on_people', Person.account_id, Person.email,
+    unique=True
+)

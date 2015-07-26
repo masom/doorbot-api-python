@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from sqlalchemy import (
-    Boolean, Column, DateTime, Integer, String, ForeignKey
+    Boolean, Column, DateTime, Integer, String, ForeignKey, Index
 )
 from ..core.model import DeclarativeBase
 
@@ -25,3 +25,7 @@ class Device(DeclarativeBase):
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)
+
+
+Index('account_id_on_devices', Device.account_id)
+Index('token_on_devices', Device.token, unique=True)

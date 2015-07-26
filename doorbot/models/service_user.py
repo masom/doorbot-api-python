@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import (
+    Column, DateTime, Integer, String, ForeignKey, Index
+)
 from ..core.model import DeclarativeBase
 
 
@@ -20,3 +22,10 @@ class ServiceUser(DeclarativeBase):
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)
+
+Index('account_id_on_service_users', ServiceUser.account_id)
+Index(
+    'unique_service_user_per_account_on_service_users',
+    ServiceUser.account_id, ServiceUser.service, ServiceUser.service_user_id,
+    unique=True
+)

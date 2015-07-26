@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Column, Boolean, DateTime, Integer, ForeignKey, Text
-from ..core.model import DeclarativeBase
+from sqlalchemy import (
+    Column, DateTime, Integer, ForeignKey, Text, Enum
+)
+from ..core.model import DeclarativeBase, JobStatuses
 
 
 class NotificationDelivery(DeclarativeBase):
@@ -21,5 +23,9 @@ class NotificationDelivery(DeclarativeBase):
 
     response = Column(Text)
 
+    status = Column(
+        Enum(*JobStatuses.to_list()), nullable=False,
+        default=JobStatuses.PENDING
+    )
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    successful = Column(Boolean, nullable=False, default=False)

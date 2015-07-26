@@ -54,3 +54,16 @@ class MutableDict(Mutable, dict):
 
         dict.__delitem__(self, key)
         self.changed()
+
+
+class JobStatuses(object):
+    PENDING = 'pending'
+    SCHEDULED = 'scheduled'
+    RUNNING = 'running'
+    FAILED = 'failed'
+    SUCCESS = 'success'
+    ERROR = 'error'
+
+    @classmethod
+    def to_list(cls):
+        return [cls.__dict__.values()]

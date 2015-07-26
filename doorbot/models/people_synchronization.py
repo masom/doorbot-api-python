@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+from datetime import datetime
+from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum
+from ..core.model import DeclarativeBase, JobStatuses
+from ..jobs import SynchronizePeopleJob
+
+
+class PeopleSynchronization(DeclarativeBase):
+    __tablename__ = 'people_synchronizations'
+
+    id = Column(Integer, primary_key=True)
+    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    status = Column(
+        Enum(*JobStatuses.to_list()), nullable=False,
+        default=JobStatuses.PENDING
+    )
+
+    def schedule(self):
+        SynchronizePeopleJob().delay(self.id)
+
+    def synchronize(self):
+
+        integration = self.account.integrations.filter_by(
+            is_enabled=True, is_deleted=False,
+            name=self.account.synchronize_people_with_integration
+        ).first()
+
+        if not integration:
+            return False
+
+        integration.synchronize_people()
+        return True

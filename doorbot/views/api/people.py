@@ -84,7 +84,9 @@ def delete(id):
 
 
 def sync():
-    pass
+    container.account.synchronize_people()
+
+    return dict(), 204
 
 
 people.add_url_rule(

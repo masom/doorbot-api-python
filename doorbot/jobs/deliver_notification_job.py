@@ -12,4 +12,4 @@ class DeliverNotificationJob(BackgroundJob):
         ).first()
 
         if not notification:
-            pass
+            return False

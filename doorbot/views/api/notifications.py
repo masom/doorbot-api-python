@@ -16,7 +16,7 @@ notifications = Blueprint(
 )
 
 
-def notify():
+def create():
     account = container.account
     person = account.people.filter_by(
         id=request.data.person_id, is_deleted=False
@@ -50,13 +50,19 @@ def notify():
 
         return dict(), 500
 
+    logger.info(
+        'notification created',
+        account_id=account.id, door_id=door.id, person_id=person.id,
+        notification_id=notification.id
+    )
+
     return dict(
         notifiation=NotificationViewModel.from_notification(notification)
     ), 204
 
 
 notifications.add_url_rule(
-    '/notify', 'notify',
-    s(validate('notifications_notify'), notify),
+    '', 'create',
+    s(validate('notifications_notify'), create),
     methods=['POST']
 )

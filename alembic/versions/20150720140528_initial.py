@@ -40,6 +40,10 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
 
+    op.create_index(
+        'unique_host_on_accounts', 'accounts', ['host'], unique=True
+    )
+
     op.create_table(
         'administrators',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -63,6 +67,9 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
         sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(
+        'account_id_on_integrations', 'integrations', ['account_id']
     )
 
     op.create_table(
@@ -93,6 +100,8 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
 
+    op.create_index('account_id_on_doors', 'doors', ['account_id'])
+
     op.create_table(
         'devices',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -111,6 +120,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['door_id'], ['doors.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
+    op.create_index('account_id_on_devices', 'devices', ['account_id'])
 
     op.create_table(
         'people',
@@ -154,6 +164,12 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
         sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_index('account_id_on_people', 'people', ['account_id'])
+    op.create_index(
+        'unique_email_per_account_on_people', 'people',
+        ['account_id', 'email'], unique=True
     )
 
     op.create_table(
@@ -206,6 +222,12 @@ def upgrade():
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
         sa.ForeignKeyConstraint(['person_id'], ['people.id'], ),
         sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_index(
+        'unique_service_user_on_service_users', 'service_users',
+        ['account_id', 'service', 'service_user_id'],
+        unique=True
     )
 
 

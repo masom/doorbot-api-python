@@ -121,6 +121,7 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index('account_id_on_devices', 'devices', ['account_id'])
+    op.create_index('token_on_devices', 'devices', ['token'], unique=True)
 
     op.create_table(
         'people',
@@ -191,6 +192,15 @@ def upgrade():
         sa.ForeignKeyConstraint(['person_id'], ['people.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(
+        'account_id_on_person_authentications', 'person_authentications',
+        ['account_id']
+    )
+    op.create_index(
+        'account_id_and_person_id_on_person_authentications',
+        'person_authentications',
+        ['account_id', 'person_id']
+    )
 
     op.create_table(
         'notifications',
@@ -205,6 +215,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['door_id'], ['doors.id'], ),
         sa.ForeignKeyConstraint(['person_id'], ['people.id'], ),
         sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(
+        'account_id_on_notifications', 'notifications',
+        ['account_id']
     )
 
     op.create_table(
@@ -223,7 +237,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['person_id'], ['people.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-
+    op.create_index(
+        'account_id_on_service_users', 'service_users',
+        ['account_id']
+    )
     op.create_index(
         'unique_service_user_on_service_users', 'service_users',
         ['account_id', 'service', 'service_user_id'],
@@ -239,6 +256,6 @@ def downgrade():
     op.drop_table('devices')
     op.drop_table('doors')
     op.drop_table('administrator_authentications')
-    op.drop_table('account_integrations')
+    op.drop_table('integrations')
     op.drop_table('administrators')
     op.drop_table('accounts')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, ForeignKey, Text
+from sqlalchemy import Column, Boolean, DateTime, Integer, ForeignKey, Text
 from ..core.model import DeclarativeBase
 
 
@@ -22,3 +22,4 @@ class NotificationDelivery(DeclarativeBase):
     response = Column(Text)
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    successful = Column(Boolean, nullable=False, default=False)

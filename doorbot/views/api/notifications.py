@@ -36,13 +36,13 @@ def notify():
 
         account.notifications.append(notification)
 
-        notification.send_later()
+        notification.schedule()
 
         container.database.commit()
 
     except Exception as e:
         logger.error(
-            "notification failure",
+            'notification failure',
             error=e, account_id=account.id, person_id=person.id,
             door_id=door.id
         )

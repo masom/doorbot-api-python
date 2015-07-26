@@ -17,7 +17,8 @@ class HipChat(IntegrationInterface):
     can_sync_users = True
 
     def notify_user(self, notification):
-        pass
+        print('notify user')
+        print(notification)
 
     def notify_group(self, notification):
         pass

@@ -60,6 +60,16 @@ class SubdomainDispatcher(object):
         return app(environ, start_response)
 
 
+def create_job_app(config=None):
+    app = Flask(__name__)
+    if config:
+        app.config.from_pyfile(config)
+
+    db.init_app(app)
+
+    return app
+
+
 def create_admin_app(config=None):
     app = Flask(__name__)
     if config:

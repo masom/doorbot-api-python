@@ -27,14 +27,14 @@ class Account(DeclarativeBase):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True, default=datetime.utcnow)
 
-    devices = relationship("Device", lazy="dynamic")
-    doors = relationship("Door", lazy="dynamic")
+    devices = relationship('Device', lazy='dynamic')
+    doors = relationship('Door', lazy='dynamic')
     integrations = relationship(
-        "Integration", lazy="dynamic"
+        'Integration', lazy='dynamic'
     )
-    notifications = relationship("Notification", lazy="dynamic")
-    people = relationship("Person", lazy="dynamic", backref='account')
-    service_users = relationship("ServiceUser", lazy="dynamic")
+    notifications = relationship('Notification', lazy='dynamic')
+    people = relationship('Person', lazy='dynamic', backref='account')
+    service_users = relationship('ServiceUser', lazy='dynamic')
 
     def create_missing_integration(self, name):
         try:

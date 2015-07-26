@@ -9,6 +9,7 @@ from .integration import Integration
 from .device import Device
 from .door import Door
 from .notification import Notification
+from .notification_delivery import NotificationDelivery
 from .person import Person
 from .person_authentication import PersonAuthentication
 from .service_user import ServiceUser

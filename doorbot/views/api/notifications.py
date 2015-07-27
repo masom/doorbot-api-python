@@ -17,19 +17,22 @@ notifications = Blueprint(
 
 
 def create():
+    json = request.get_json()
+
     account = container.account
     person = account.people.filter_by(
-        id=request.data.person_id, is_deleted=False
+        id=json['notification']['person_id'], is_deleted=False
     ).first()
+
     door = account.doors.filter_by(
-        id=request.data.door_id, is_deleted=False
+        id=json['notification']['door_id'], is_deleted=False
     ).first()
 
     if not door:
-        return dict(), 422
+        return dict(), 400
 
     if not person:
-        return dict(), 422
+        return dict(), 400
 
     try:
         notification = Notification(person_id=person.id, door_id=door.id)
@@ -63,6 +66,6 @@ def create():
 
 notifications.add_url_rule(
     '', 'create',
-    s(validate('notifications_notify'), create),
+    s(validate('notifications_create'), create),
     methods=['POST']
 )

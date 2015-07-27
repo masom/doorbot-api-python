@@ -2,8 +2,10 @@
 
 from .background_job import BackgroundJob
 from ..db import db
+from celery import shared_task
 
 
+@shared_task()
 class DeliverNotificationJob(BackgroundJob):
     def run(self, notification_id):
 

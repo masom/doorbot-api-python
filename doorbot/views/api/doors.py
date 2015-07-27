@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from ...middlewares import(
     s, auth_manager, validate
 )
+from ...models import Door
 from ...container import container
 from .view_models import Door as DoorViewModel
 
@@ -30,15 +31,17 @@ def view(id):
 
 
 def create():
+    json = request.get_json()
+
     doors = container.account.doors
 
-    door = doors.new()
-    door.name = request.data.name
+    door = Door()
+    door.name = json['door']['name']
     doors.append(door)
 
     container.database.commit()
 
-    return dict(door=DoorViewModel.from_door(door)), 204
+    return dict(door=DoorViewModel.from_door(door)), 201
 
 
 def update(id):

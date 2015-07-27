@@ -7,6 +7,7 @@ from .db import db
 from .schema_validator import jsonschema
 from .sessions import ItsdangerousSessionInterface
 from .views.api.lib.json_serializer import ApiJsonEncoder
+from celery import Celery
 
 
 class SubdomainDispatcher(object):
@@ -36,6 +37,9 @@ class SubdomainDispatcher(object):
         for name, factory in self.factories.items():
             self.apps[name] = factory(self.config)
             self.apps[name].debug = self.debug
+
+    def by_name(self, name):
+        return self.apps[name]
 
     def get_application(self, environ):
         """Get the proper application for the given http environment
@@ -134,3 +138,10 @@ def create_api_app(config=None):
     app.register_blueprint(people)
 
     return app
+
+
+def create_celery_app(config=None):
+    celery = Celery('jobs')
+    celery.config_from_object(config)
+
+    return celery

@@ -3,11 +3,13 @@
 from werkzeug.serving import run_simple
 from doorbot.factory import SubdomainDispatcher
 from doorbot.factory import (
-    create_api_app, create_admin_app, create_public_app
+    create_api_app, create_admin_app, create_public_app,
+    create_celery_app
 )
 import logging
 import structlog
 import sys
+
 
 root = logging.getLogger('doorbot')
 root.setLevel(logging.DEBUG)
@@ -41,6 +43,8 @@ application.add_app_factory('admin', create_admin_app)
 application.add_app_factory('api', create_api_app)
 application.add_app_factory('public', create_public_app)
 application.initialize()
+
+create_celery_app()
 
 run_simple('localhost', 5000, application,
            use_reloader=True, use_debugger=True, use_evalex=True)

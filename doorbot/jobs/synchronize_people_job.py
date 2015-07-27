@@ -3,9 +3,11 @@
 from .background_job import BackgroundJob
 from ..db import db
 from structlog import get_logger
+from celery import shared_task
 logger = get_logger()
 
 
+@shared_task()
 class SynchronizePeopleJob(BackgroundJob):
 
     def run(self, people_synchronization_id):

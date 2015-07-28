@@ -2,3 +2,7 @@
 
 from .deliver_notification_job import DeliverNotificationJob
 from .synchronize_people_job import SynchronizePeopleJob
+
+
+def get_jobs():
+    return [DeliverNotificationJob, SynchronizePeopleJob]

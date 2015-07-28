@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from .background_job import BackgroundJob
 from ..db import db
-from celery import shared_task
+from celery import Task
 
 
-@shared_task()
-class DeliverNotificationJob(BackgroundJob):
+class DeliverNotificationJob(Task):
+    ignore_result = True
+
     def run(self, notification_id):
 
         notification = db.session.query('Notification').filter_by(

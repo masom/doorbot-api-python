@@ -44,7 +44,7 @@ application.add_app_factory('api', create_api_app)
 application.add_app_factory('public', create_public_app)
 application.initialize()
 
-create_celery_app()
+celery = create_celery_app(application.apps['api'].config)
 
 run_simple('localhost', 5000, application,
            use_reloader=True, use_debugger=True, use_evalex=True)

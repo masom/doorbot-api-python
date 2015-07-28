@@ -4,6 +4,7 @@ import os
 from flask import Flask
 from .container import container
 from .db import db
+from .jobs import get_jobs
 from .schema_validator import jsonschema
 from .sessions import ItsdangerousSessionInterface
 from .views.api.lib.json_serializer import ApiJsonEncoder
@@ -142,6 +143,13 @@ def create_api_app(config=None):
 
 def create_celery_app(config=None):
     celery = Celery('jobs')
-    celery.config_from_object(config)
+    celery.conf.update(
+        CELERY_IMPORTS=config.get('CELERY_IMPORTS', ('doorbot.tasks',)),
+        BROKER_URL=config.get('CELERY_BROKER_URL'),
+        CELERY_ACCEPT_CONTENT=config.get('CELERY_ACCEPT_CONTENT', ['json'])
+    )
+
+    for job in get_jobs():
+        job.bind(celery)
 
     return celery

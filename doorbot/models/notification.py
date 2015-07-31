@@ -3,9 +3,8 @@
 from datetime import datetime
 from sqlalchemy import Column, DateTime, Integer, ForeignKey, Index
 from sqlalchemy.orm import relationship
-from ..core.model import DeclarativeBase
+from ..core.model import DeclarativeBase, JobStatuses
 from .notification_delivery import NotificationDelivery
-from ..jobs import DeliverNotificationJob
 
 
 class Notification(DeclarativeBase):
@@ -22,31 +21,32 @@ class Notification(DeclarativeBase):
         'NotificationDelivery', lazy='dynamic', backref='notification'
     )
 
-    def schedule(self):
-        DeliverNotificationJob().delay(self.id)
-
     def send(self):
         integrations = self.account.integrations.filter_by(
-            is_enabled=True, is_deleted=False
+            is_active=True
         ).all()
 
         for integration in integrations:
+
+            print(integration.name)
             # TODO allow sending notifications to a group vs a person
             if self.person_id:
-                if integration.can_notify_users:
+                if integration.adapter.can_notify_user(self):
                     delivery = NotificationDelivery()
                     delivery.notification_id = self.id
                     delivery.account_id = self.account_id
                     delivery.integration_id = integration.id
 
                     try:
-                        delivery.response = integration.adapter.notify_user()
-                        delivery.successful = True
+                        integration.adapter.notify_user(
+                            self, delivery
+                        )
                     except Exception as e:
-                        delivery.response = e
-                        delivery.successful = False
+                        delivery.response = str(e)
+                        delivery.status = JobStatuses.ERROR
 
                     self.deliveries.append(delivery)
+                    print(delivery.response)
 
             elif integration.can_notify_group:
                 pass

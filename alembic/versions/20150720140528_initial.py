@@ -207,7 +207,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('account_id', sa.Integer(), nullable=False),
         sa.Column('door_id', sa.Integer(), nullable=False),
-        sa.Column('device_id', sa.Integer(), nullable=False),
+        sa.Column('device_id', sa.Integer(), nullable=True),
         sa.Column('person_id', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),

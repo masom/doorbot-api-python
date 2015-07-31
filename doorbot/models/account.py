@@ -32,7 +32,9 @@ class Account(DeclarativeBase):
     integrations = relationship(
         'Integration', lazy='dynamic'
     )
-    notifications = relationship('Notification', lazy='dynamic')
+    notifications = relationship(
+        'Notification', lazy='dynamic', backref='account'
+    )
     people = relationship('Person', lazy='dynamic', backref='account')
     service_users = relationship('ServiceUser', lazy='dynamic')
 

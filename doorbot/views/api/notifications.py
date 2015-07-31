@@ -8,6 +8,7 @@ from ...container import container
 from .view_models import Notification as NotificationViewModel
 from ...models import Notification
 from structlog import get_logger
+from ...jobs import DeliverNotificationJob
 
 logger = get_logger()
 
@@ -39,7 +40,9 @@ def create():
 
         account.notifications.append(notification)
 
-        notification.schedule()
+        container.database.flush()
+
+        DeliverNotificationJob().delay(notification.id)
 
         container.database.commit()
 

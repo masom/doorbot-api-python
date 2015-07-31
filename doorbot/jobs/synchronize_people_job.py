@@ -2,11 +2,11 @@
 
 from ..db import db
 from structlog import get_logger
-from celery import Task
+from .background_job import BackgroundJob
 logger = get_logger()
 
 
-class SynchronizePeopleJob(Task):
+class SynchronizePeopleJob(BackgroundJob):
 
     ignore_result = True
     timeout = 10

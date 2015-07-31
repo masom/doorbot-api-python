@@ -5,7 +5,7 @@ from .model import ViewModel
 
 class Notification(ViewModel):
 
-    fields = []
+    fields = ['created_at', 'device_id', 'door_id', 'id', 'person_id']
 
     @classmethod
     def from_notification(cls, notification):

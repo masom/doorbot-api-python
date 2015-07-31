@@ -2,13 +2,9 @@
 
 import os
 from flask import Flask
-from .container import container
 from .db import db
-from .jobs import get_jobs
 from .schema_validator import jsonschema
 from .sessions import ItsdangerousSessionInterface
-from .views.api.lib.json_serializer import ApiJsonEncoder
-from celery import Celery
 
 
 class SubdomainDispatcher(object):
@@ -65,16 +61,6 @@ class SubdomainDispatcher(object):
         return app(environ, start_response)
 
 
-def create_worker_app(config=None):
-    app = Flask(__name__)
-    if config:
-        app.config.from_pyfile(config)
-
-    db.init_app(app)
-
-    return app
-
-
 def create_admin_app(config=None):
     app = Flask(__name__)
     if config:
@@ -83,6 +69,8 @@ def create_admin_app(config=None):
     app.url_map.strict_slashes = False
 
     db.init_app(app)
+
+    from .container import container
     container.init_app(app)
 
     from .views.admin import (accounts)
@@ -102,6 +90,8 @@ def create_public_app(config=None):
     app.url_map.strict_slashes = False
 
     db.init_app(app)
+
+    from .container import container
     container.init_app(app)
 
     from .views.public import (public)
@@ -123,11 +113,14 @@ def create_api_app(config=None):
 
     jsonschema.init_app(app)
     db.init_app(app)
+
+    from .container import container
     container.init_app(app)
 
     from .views.api import (
         account, auth, devices, doors, integrations, notifications, people
     )
+    from .views.api.lib.json_serializer import ApiJsonEncoder
 
     app.json_encoder = ApiJsonEncoder
     app.register_blueprint(auth)
@@ -139,17 +132,3 @@ def create_api_app(config=None):
     app.register_blueprint(people)
 
     return app
-
-
-def create_celery_app(config=None):
-    celery = Celery('jobs')
-    celery.conf.update(
-        CELERY_IMPORTS=config.get('CELERY_IMPORTS', ('doorbot.tasks',)),
-        BROKER_URL=config.get('CELERY_BROKER_URL'),
-        CELERY_ACCEPT_CONTENT=config.get('CELERY_ACCEPT_CONTENT', ['json'])
-    )
-
-    for job in get_jobs():
-        job.bind(celery)
-
-    return celery

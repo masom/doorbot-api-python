@@ -2,7 +2,6 @@
 from datetime import datetime
 from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum, Index
 from ..core.model import DeclarativeBase, JobStatuses
-from ..jobs import SynchronizePeopleJob
 
 
 class PeopleSynchronization(DeclarativeBase):
@@ -16,9 +15,6 @@ class PeopleSynchronization(DeclarativeBase):
         Enum(*JobStatuses.to_list(), name="job_statuses"), nullable=False,
         default=JobStatuses.PENDING
     )
-
-    def schedule(self):
-        SynchronizePeopleJob().delay(self.id)
 
     def synchronize(self):
 

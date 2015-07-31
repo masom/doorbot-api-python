@@ -14,8 +14,14 @@ class IntegrationInterface(object):
     can_notify_group = False
     can_sync_users = False
 
-    def __init__(self, properties):
+    def __init__(self, integration_id, properties):
         self._properties = properties or {}
+        self.integration_id = integration_id
+
+    def get_service_user(self, notification):
+        return notification.person.service_users.filter_by(
+            service=self.name
+        ).first()
 
     def fetch_users(self):
         raise NotImplementedError()

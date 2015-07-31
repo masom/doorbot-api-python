@@ -42,7 +42,7 @@ def create():
 
         instance.properties[name] = value
 
-    instance.is_active = json['integration'].get('is_active', False)
+    instance.is_active = json['integration'].get('is_active', True)
     container.account.integrations.append(instance)
     container.database.commit()
 

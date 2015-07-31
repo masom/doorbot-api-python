@@ -16,7 +16,7 @@ class Integration(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     name = Column('name', String, nullable=False)
     account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
-    is_active = Column(Boolean, default=False, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
 
     properties = Column(MutableDict.as_mutable(JsonType))
 

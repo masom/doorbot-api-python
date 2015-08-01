@@ -38,6 +38,9 @@ class Account(DeclarativeBase):
         'Notification', lazy='dynamic', backref='account'
     )
     people = relationship('Person', lazy='dynamic', backref='account')
+    people_synchronizations = relationship(
+        'PeopleSynchronization', lazy='dynamic', backref='account'
+    )
     service_users = relationship('ServiceUser', lazy='dynamic')
 
     def create_missing_integration(self, name):

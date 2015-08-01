@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint
+from flask import Blueprint, request
 from ...container import container
 from ...middlewares import (
     s, auth_owner, validate
 )
 from .view_models import PublicAccount, Account as AccountViewModel
 
-bp = Blueprint('account', __name__, url_prefix='/api/account')
+account = Blueprint('account', __name__, url_prefix='/api/account')
 
 
 def view():
@@ -33,11 +33,34 @@ def view():
 
 
 def update():
-
+    json = request.get_json()
     account = container.account
 
-    if not account:
-        pass
+    account.contact_name = json['account'].get(
+        'contact_name', account.contact_name
+    )
+    account.contact_phone_number = json['account'].get(
+        'contact_phone_number',
+        account.contact_phone_number
+    )
+    account.contact_email = json['account'].get(
+        'contact_email',
+        account.contact_email
+    )
+
+    synchronize_people_with_integration_id = json['account'].get(
+        'synchronize_people_with_integration_id',
+        account.synchronize_people_with_integration_id
+    )
+    if synchronize_people_with_integration_id > 0:
+        integration = account.integrations.filter_by(
+            id=synchronize_people_with_integration_id
+        ).first()
+
+        if integration:
+            account.synchronize_people_with_integration_id = integration.id
+        else:
+            return dict(), 400
 
     container.database.commit()
 
@@ -45,12 +68,12 @@ def update():
         account=AccountViewModel.from_account(account)
     )
 
-bp.add_url_rule(
+account.add_url_rule(
     '', 'view', s(view),
     methods=['GET']
 )
 
-bp.add_url_rule(
+account.add_url_rule(
     '', 'update',
     s(auth_owner, validate('account_update'), update),
     methods=['PUT']

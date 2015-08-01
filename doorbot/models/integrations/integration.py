@@ -15,7 +15,7 @@ class IntegrationInterface(object):
     can_sync_users = False
 
     def __init__(self, integration):
-        self.properties = integration.properties or {}
+        self._properties = integration.properties or {}
         self.integration = integration
 
     def can_fetch_users(self):
@@ -46,10 +46,7 @@ class IntegrationInterface(object):
         return []
 
     def __getattr__(self, attr):
-
         if attr in self.properties:
             return self._properties.get(attr, None)
 
-        raise AttributeError(
-            'Attribute `{attr}` does not exists'.format(attr=attr)
-        )
+        return super(object, self).__getattr__(attr)

@@ -3,6 +3,8 @@ from ...middlewares import (
     s, auth_manager, validate
 )
 from ...container import container
+from ...models import PeopleSynchronization
+from ...jobs import SynchronizePeopleJob
 from .view_models import PublicPerson, Person as PersonViewModel
 
 people = Blueprint('people', __name__, url_prefix='/api/people')
@@ -84,7 +86,13 @@ def delete(id):
 
 
 def sync():
-    container.account.synchronize_people()
+    sync = PeopleSynchronization()
+    container.account.people_synchronizations.append(sync)
+    container.database.flush()
+
+    SynchronizePeopleJob().delay(sync.id)
+
+    container.database.commit()
 
     return dict(), 204
 

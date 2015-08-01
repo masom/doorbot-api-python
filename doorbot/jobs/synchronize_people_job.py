@@ -28,12 +28,18 @@ class SynchronizePeopleJob(BackgroundJob):
 
         try:
             sync.synchronize()
+            sync.status = JobStatuses.SUCCESS
         except Exception as e:
+            import traceback
+
             logger.error(
                 'synchronization error',
                 error=e, people_synchronization_id=sync.id,
-                account_id=sync.account_id
+                account_id=sync.account_id,
+                trace=traceback.format_exc()
             )
             sync.status = JobStatuses.ERROR
             db.session.commit()
             return False
+
+        db.session.commit()

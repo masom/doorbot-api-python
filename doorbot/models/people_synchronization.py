@@ -4,6 +4,8 @@ from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum, Index
 from ..core.model import DeclarativeBase, JobStatuses
 from structlog import get_logger
 from ..db import db
+from .person import Person
+
 logger = get_logger()
 
 
@@ -57,8 +59,15 @@ class PeopleSynchronization(DeclarativeBase):
             if existing:
                 existing.name = service_user.name
             else:
+                person = Person()
+                person.email = service_user.email
+                person.name = service_user.name
+                person.phone_number = service_user.phone_number
+                person.title = service_user.title
+
                 service_user.account_id = self.account_id
-                self.account.service_users.append(service_user)
+                self.account.people.append(person)
+                person.service_users.append(service_user)
 
         db.session.commit()
         return True

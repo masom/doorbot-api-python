@@ -53,6 +53,33 @@ def create():
     ), 201
 
 
+def update(id):
+    json = request.get_json()
+
+    account = container.account
+
+    integration = account.integrations.filter_by(id=id).first()
+
+    if not integration:
+        return dict(), 404
+
+    for name, value in json['integration'].items():
+        if name not in integration.adapter.properties:
+            continue
+
+        integration.properties[name] = value
+
+    integration.is_active = json['integration'].get(
+        'is_active', integration.is_active
+    )
+
+    container.database.commit()
+
+    return dict(
+        integration=IntegrationViewModel.from_integration(integration)
+    ), 201
+
+
 integrations.add_url_rule(
     '', 'index',
     s(auth_manager, index),
@@ -63,4 +90,10 @@ integrations.add_url_rule(
     '', 'create',
     s(auth_manager, validate('integration_create'), create),
     methods=['POST']
+)
+
+integrations.add_url_rule(
+    '/<int:id>', 'update',
+    s(auth_manager, validate('integration_update'), update),
+    methods=['PUT', 'PATCH']
 )

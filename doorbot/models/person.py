@@ -42,6 +42,10 @@ class Person(DeclarativeBase):
         "PersonAuthentication", lazy="dynamic", backref='person'
     )
 
+    service_users = relationship(
+        'ServiceUser', lazy='dynamic', backref='person'
+    )
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)
 

@@ -19,6 +19,7 @@ class ServiceUser(DeclarativeBase):
     name = Column(String)
     email = Column(String)
     phone_number = Column(String)
+    title = Column(String)
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)

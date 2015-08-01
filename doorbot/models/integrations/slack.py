@@ -37,11 +37,12 @@ class Slack(IntegrationInterface):
     def fetch_users(self):
         slacker = Slacker(self.token)
         response = slacker.users.list()
-        if not response.ok:
+        if not response.successful:
             logger.warning(
                 'Slack fetch_users failed',
                 response=response.raw,
-                integration_id=self.integration.id
+                integration_id=self.integration.id,
+                account_id=self.integration.account_id
             )
             return False
 
@@ -51,14 +52,27 @@ class Slack(IntegrationInterface):
             if member['deleted']:
                 continue
 
+            if member['profile'].get('bot_id', False):
+                continue
+
+            if not member['profile'].get('email', False):
+                continue
+
             user = ServiceUser()
             user.integration_id = self.integration.id
             user.service = self.name
             user.name = member['profile']['real_name']
             user.email = member['profile']['email']
-            user.phone_number = member['profile']['phone_number']
+            user.phone_number = member['profile'].get('phone_number')
+            user.service_user_id = member['id']
             users.append(user)
 
+        logger.info(
+            'Slack fetch_users completed',
+            count=len(users),
+            account_id=self.integration.account_id,
+            integration_id=self.integration.id
+        )
         return users
 
     def notify_user(self, notification, delivery):

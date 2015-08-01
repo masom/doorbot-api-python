@@ -19,11 +19,7 @@ class Integration(ViewModel):
         )
 
         for key in integration.adapter.properties:
-            if hasattr(integration, key):
-                value = getattr(integration, key)
-            else:
-                value = None
-
+            value = integration.properties.get(key, None)
             setattr(instance, key, value)
 
         return instance

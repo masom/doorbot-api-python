@@ -24,6 +24,8 @@ class Account(DeclarativeBase):
     contact_email_confirmed = Column(Boolean, default=False, nullable=False)
     contact_phone_number = Column(String)
 
+    synchronize_people_with_integration_id = Column(Integer, nullable=True)
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True, default=datetime.utcnow)
 

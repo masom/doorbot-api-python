@@ -39,7 +39,7 @@ class Integration(DeclarativeBase):
 
         for integration in available_integrations:
             if integration.name == self.name:
-                self.adapter = integration(self.properties)
+                self.adapter = integration(self)
                 break
 
     def initialize_properties(self):

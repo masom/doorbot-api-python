@@ -32,7 +32,7 @@ def create():
         return dict(), 400
 
     exists = account.integrations.filter_by(name=instance.name).first()
-    if exists and exists.allow_multiple is False:
+    if exists and exists.adapter.allow_multiple is False:
         return dict(), 400
 
     instance.properties = {}
@@ -45,6 +45,8 @@ def create():
     instance.is_active = json['integration'].get('is_active', True)
     container.account.integrations.append(instance)
     container.database.commit()
+
+    instance.reconstructor()
 
     return dict(
         integration=IntegrationViewModel.from_integration(instance)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum, Index
+from sqlalchemy import (
+    Boolean, Column, DateTime, Integer, ForeignKey, Enum, Index
+)
 from ..core.model import DeclarativeBase, JobStatuses
 from structlog import get_logger
 from ..db import db
@@ -20,6 +22,8 @@ class PeopleSynchronization(DeclarativeBase):
         Enum(*JobStatuses.to_list(), name="job_statuses"), nullable=False,
         default=JobStatuses.PENDING
     )
+
+    is_only_adding_new = Column(Boolean, nullable=False, default=True)
 
     def synchronize(self):
 
@@ -57,6 +61,9 @@ class PeopleSynchronization(DeclarativeBase):
             )
 
             if existing:
+                if self.is_only_adding_new:
+                    continue
+
                 existing.name = service_user.name
             else:
                 person = Person()

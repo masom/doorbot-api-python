@@ -10,12 +10,7 @@ from .twilio import Twilio
 from .webhook import Webhook
 
 available_integrations = [
-    HipChat,
-    Hub,
     Mailgun,
-    Nexmo,
-    Postmark,
     Slack,
-    Twilio,
     Webhook
 ]

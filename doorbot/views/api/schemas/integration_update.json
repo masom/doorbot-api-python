@@ -4,7 +4,8 @@
     "properties": {
         "integration":{
             "properties":{
-                "is_active": { "type": "boolean" }
+                "is_active": { "type": "boolean" },
+                "synchronize_users": {"type": "boolean"}
             },
             "additionalProperties": true
         }

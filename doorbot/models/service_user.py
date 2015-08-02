@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column, DateTime, Integer, String, ForeignKey, Index
 )
-from ..core.model import DeclarativeBase
+from ..core.model import DeclarativeBase, MutableDict, JsonType
 
 
 class ServiceUser(DeclarativeBase):
@@ -20,6 +20,7 @@ class ServiceUser(DeclarativeBase):
     email = Column(String)
     phone_number = Column(String)
     title = Column(String)
+    extra = Column(MutableDict.as_mutable(JsonType))
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)

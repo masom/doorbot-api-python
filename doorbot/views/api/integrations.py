@@ -73,6 +73,9 @@ def update(id):
         'is_active', integration.is_active
     )
 
+    if json['integration'].get('synchronize_users', False):
+        account.synchronize_people_with_integration_id = integration.id
+
     container.database.commit()
 
     return dict(

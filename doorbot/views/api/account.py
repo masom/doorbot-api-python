@@ -52,6 +52,7 @@ def update():
         'synchronize_people_with_integration_id',
         account.synchronize_people_with_integration_id
     )
+
     if synchronize_people_with_integration_id > 0:
         integration = account.integrations.filter_by(
             id=synchronize_people_with_integration_id

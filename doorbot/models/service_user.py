@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column, DateTime, Integer, String, ForeignKey, Index
 )
+from sqlalchemy.orm import reconstructor
 from ..core.model import DeclarativeBase, MutableDict, JsonType
 
 
@@ -24,6 +25,14 @@ class ServiceUser(DeclarativeBase):
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)
+
+    def __init__(self):
+        self.reconstructor()
+
+    @reconstructor
+    def reconstructor(self):
+        if not self.extra:
+            self.extra = {}
 
 Index('account_id_on_service_users', ServiceUser.account_id)
 Index(

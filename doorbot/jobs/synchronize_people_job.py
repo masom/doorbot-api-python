@@ -26,6 +26,9 @@ class SynchronizePeopleJob(BackgroundJob):
             )
             return False
 
+        sync.status = JobStatuses.RUNNING
+        db.session.commit()
+
         try:
             sync.synchronize()
             sync.status = JobStatuses.SUCCESS
@@ -38,7 +41,10 @@ class SynchronizePeopleJob(BackgroundJob):
                 account_id=sync.account_id,
                 trace=traceback.format_exc()
             )
+            db.session.rollback()
+
             sync.status = JobStatuses.ERROR
+
             db.session.commit()
             return False
 

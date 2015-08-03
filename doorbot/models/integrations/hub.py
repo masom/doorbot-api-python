@@ -15,10 +15,10 @@ class Hub(IntegrationInterface):
     url = "http://workshopx.com"
 
     can_notify_group = False
-    can_notify_users = False
-    can_sync_users = True
+    can_notify_people = False
+    can_sync_people = True
 
-    def fetch_users(self):
+    def fetch_people(self):
 
         """
         url = "{base}/api/people".format(base=self.url)

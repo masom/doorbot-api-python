@@ -18,18 +18,10 @@ class Mailgun(IntegrationInterface):
     url = "http://www.mailgun.com/"
 
     can_notify_group = False
-    can_notify_users = True
-    can_sync_users = False
+    can_notify_people = True
+    can_sync_people = False
 
-    def can_notify_users(self, notification):
-        return self.can_notify_users and len(self.token) > 0 \
-            and len(self.domain) > 0
-
-    def can_notify_groups(self, notification):
-        return self.can_notify_group and len(self.token) > 0 \
-            and len(self.group_email) > 3
-
-    def notify_user(self, notification, delivery):
+    def notify_person(self, notification, delivery):
         return self._send(notification, delivery, notification.person.email)
 
     def notify_group(self, notification, delivery):

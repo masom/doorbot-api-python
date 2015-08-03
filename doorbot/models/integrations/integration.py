@@ -10,35 +10,26 @@ class IntegrationInterface(object):
     url = ""
 
     allow_multiple = False
-    can_notify_users = False
+    can_notify_people = False
     can_notify_group = False
-    can_sync_users = False
+    can_sync_people = False
 
     def __init__(self, integration):
         self._properties = integration.properties or {}
         self.integration = integration
-
-    def can_fetch_users(self):
-        raise NotImplementedError()
-
-    def can_notify_users(self, notification):
-        raise NotImplementedError()
-
-    def can_notify_groups(self, notification):
-        raise NotImplementedError()
 
     def get_service_user(self, notification):
         return notification.person.service_users.filter_by(
             service=self.name
         ).first()
 
-    def fetch_users(self):
+    def fetch_people(self):
         raise NotImplementedError()
 
-    def notify_user(self, notification):
+    def notify_person(self, notification, delivery):
         raise NotImplementedError()
 
-    def notify_group(self, notification):
+    def notify_group(self, notification, delivery):
         raise NotImplementedError()
 
     @classmethod
@@ -48,5 +39,3 @@ class IntegrationInterface(object):
     def __getattr__(self, attr):
         if attr in self.properties:
             return self._properties.get(attr, None)
-
-        return super(object, self).__getattr__(attr)

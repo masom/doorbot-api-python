@@ -14,8 +14,8 @@ class Postmark(IntegrationInterface):
     url = "https://postmarkapp.com/"
 
     can_notify_group = False
-    can_notify_users = True
-    can_sync_users = False
+    can_notify_people = True
+    can_sync_people = False
 
     @classmethod
     def fields(cls):

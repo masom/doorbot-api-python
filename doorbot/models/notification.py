@@ -38,13 +38,13 @@ class Notification(DeclarativeBase):
 
             try:
                 if self.person_id and \
-                        integration.adapter.can_notify_users(self):
+                        integration.adapter.can_notify_people:
 
-                    integration.adapter.notify_user(
+                    integration.adapter.notify_person(
                         self, delivery
                     )
 
-                elif integration.can_notify_groups(self):
+                elif integration.adapter.can_notify_group:
                     integration.adapter.notify_group(
                         self, delivery
                     )
@@ -52,12 +52,15 @@ class Notification(DeclarativeBase):
             except Exception as e:
                 delivery.response = str(e)
                 delivery.status = JobStatuses.ERROR
+                import traceback
+
                 logger.error(
                     'Notification delivery error',
                     error=e,
                     account_id=self.account_id,
                     notification_id=self.id,
-                    integration_id=integration.id
+                    integration_id=integration.id,
+                    trace=traceback.format_exc()
                 )
 
             print(delivery.response)

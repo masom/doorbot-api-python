@@ -18,7 +18,7 @@ class Person(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
 
-    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
+    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
     account_type = Column(Integer)
 
     name = Column(String)
@@ -37,9 +37,11 @@ class Person(DeclarativeBase):
     )
     notifications_sms_enabled = Column(Boolean, default=False, nullable=False)
 
-    notifications = relationship("Notification", lazy="dynamic")
+    notifications = relationship(
+        'Notification', lazy='dynamic', backref='person'
+    )
     authentications = relationship(
-        "PersonAuthentication", lazy="dynamic", backref='person'
+        'PersonAuthentication', lazy='dynamic', backref='person'
     )
 
     service_users = relationship(

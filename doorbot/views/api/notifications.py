@@ -64,7 +64,7 @@ def create():
 
     return dict(
         notifiation=NotificationViewModel.from_notification(notification)
-    ), 204
+    ), 201
 
 
 notifications.add_url_rule(

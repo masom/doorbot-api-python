@@ -94,7 +94,7 @@ def sync():
 
     container.database.commit()
 
-    return dict(), 204
+    return dict(), 201
 
 
 people.add_url_rule(

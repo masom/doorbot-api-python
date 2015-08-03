@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from slacker import Slacker
+from slacker import Slacker, Response
+import requests
 from .integration import IntegrationInterface
 from ..service_user import ServiceUser
 from ...core.model import JobStatuses
@@ -19,22 +20,10 @@ class Slack(IntegrationInterface):
     url = "https://slack.com/"
 
     can_notify_group = True
-    can_notify_users = True
-    can_sync_users = True
+    can_notify_people = True
+    can_sync_people = True
 
-    def can_notify_users(self, notification):
-        if not self.can_notify_users or not notification.user_id:
-            return False
-
-        return self.get_service_user(notification) or False
-
-    def can_notify_groups(self, notification):
-        return self.can_notify_group and len(self.group_channel) > 0
-
-    def can_fetch_users(self):
-        return self.can_fetch_users and len(self.token) > 0
-
-    def fetch_users(self):
+    def fetch_people(self):
         slacker = Slacker(self.token)
         response = slacker.users.list()
         if not response.successful:
@@ -65,6 +54,7 @@ class Slack(IntegrationInterface):
             user.email = member['profile']['email']
             user.phone_number = member['profile'].get('phone_number')
             user.service_user_id = member['id']
+            user.extra['username'] = member['name']
             users.append(user)
 
         logger.info(
@@ -75,37 +65,44 @@ class Slack(IntegrationInterface):
         )
         return users
 
-    def notify_user(self, notification, delivery):
+    def notify_person(self, notification, delivery):
         message = "Hello {name}," \
                   "someone is waiting at the {door_name} door.".format(
                       name=notification.person.name,
                       door_name=notification.door.name
                   )
 
-        slacker = Slacker(self.token)
+        slacker = Slacker(
+            token=self.token, incoming_webhook_url=self.incoming_webhook_url
+        )
+
+        username = self.get_service_user(notification).extra.get(
+            'username', None
+        )
+
+        if not username:
+            delivery.status = JobStatuses.FAILED
+            return False
 
         data = dict(
             username="Doorbot",
-            payload=message,
+            text=message,
             channel="@{channel}".format(
-                channel=self.get_service_user(notification).service_user_id
+                channel=username
             )
         )
 
+        logger.info('derp', data=data)
+
         response = slacker.incomingwebhook.post(data)
 
-        if not response.successful:
-            delivery.status = JobStatuses.FAILED
-            delivery.response = response.raw
-            return False
-
-        id = response.body['channel']['id']
-
-        response = slacker.chat.post_message(
-            channel=id, text=message, username="Doorbot"
+        logger.debug(
+            'slack webhook response',
+            response_status_code=response.status_code,
+            response_text=response.text
         )
 
-        if not response.successful:
+        if not response.status_code == requests.STATUS_OK:
             delivery.status = JobStatuses.FAILED
             delivery.response = response.raw
         else:
@@ -117,7 +114,9 @@ class Slack(IntegrationInterface):
             door_name=notification.door.name
         )
 
-        slacker = Slacker(self.token)
+        slacker = Slacker(
+            token=self.token, incoming_webhook_url=self.incoming_webhook_url
+        )
         data = dict(
             username="Doorbot",
             payload=message,
@@ -126,7 +125,7 @@ class Slack(IntegrationInterface):
             )
         )
 
-        response = slacker.incomingwebhook.post(data)
+        response = Response(slacker.incomingwebhook.post(data))
 
         if not response.successful:
             delivery.status = JobStatuses.FAILED

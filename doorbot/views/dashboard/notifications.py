@@ -1,6 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 from ...container import container
-from ...middlewares.dashboard import (render, s)
+from .middlewares import s
 
 notifications = Blueprint(
     'notifications', __name__, url_prefix='/notifications'
@@ -8,13 +8,14 @@ notifications = Blueprint(
 
 
 def index():
-    return dict(
+    return render_template(
+        'notifications/index.html',
         notifications=container.account.notifications.all()
     )
 
 
 notifications.add_url_rule(
     '', 'index',
-    s(index, render('notifications/index.html')),
+    s(index),
     methods=['GET']
 )

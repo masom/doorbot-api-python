@@ -1,27 +1,28 @@
-from flask import Blueprint
-from ...middlewares.dashboard import (m, render)
+from flask import Blueprint, render_template, redirect, url_for
+from .middlewares import m
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 def login():
-    return dict()
+    return render_template('auth/login.html')
 
 
 def logout():
-    return dict()
+    return redirect(url_for('.login'))
 
 
 def reset_password(hash, nonce):
-    return dict()
+    return render_template('auth/reset_password.html')
 
 
-def forget_password():
-    return dict()
+def forgot_password():
+    return render_template('auth/forgot_password.html')
 
 
 def github():
-    pass
+    github_redirect_url = ''
+    return redirect(github_redirect_url)
 
 
 def github_callback():
@@ -30,7 +31,7 @@ def github_callback():
 
 auth.add_url_rule(
     '/login', 'login',
-    m(login, render('auth/login.html')),
+    m(login),
     methods=['GET', 'POST']
 )
 

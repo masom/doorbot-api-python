@@ -1,8 +1,6 @@
-from flask import Blueprint
-from ...middlewares.dashboard import (
-    auth_manager
-)
-from .middlewars import (render, s)
+from flask import Blueprint, abort, render_template
+from ...middlewares import auth_manager
+from .middlewars import s
 from ...container import container
 
 
@@ -18,17 +16,25 @@ def index():
 
 def view(id):
     account = container.account
-    return dict(transactions=account.transactions.filter_by(id=id).first())
+    transaction = account.transactions.filter_by(id=id).first()
+
+    if not transaction:
+        abort(404)
+
+    return render_template(
+        'account_transactions/view.html',
+        transaction=transaction
+    )
 
 
 account_transactions.add_url_rule(
     '', 'index',
-    s(auth_manager, index, render('account_transactions/view.html')),
+    s(auth_manager, index, render_template('account_transactions/view.html')),
     methods=['GET']
 )
 
 account_transactions.add_url_rule(
     '/<int:id>', 'view',
-    s(auth_manager, view, render('account_transactions/view.html')),
+    s(auth_manager, view),
     methods=['GET']
 )

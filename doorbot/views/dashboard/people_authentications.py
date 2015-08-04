@@ -1,6 +1,7 @@
-from flask import Blueprint
+from flask import Blueprint, render_template, abort, redirect, url_for
 from ...container import container
-from ...middlewares.dashboard import (auth_manager, render, s)
+from ...middlewares import auth_manager
+from .middlewares import s
 
 people_authentications = Blueprint(
     'people_authentications', __name__, url_prefix='/people'
@@ -8,44 +9,66 @@ people_authentications = Blueprint(
 
 
 def index():
-    return dict(
-        people_authentications=container.account.people_authentications.all()
+    return render_template(
+        'people_authentications/index.html',
+        people_authentications=container.authorization.person.all()
     )
 
 
-def create(person_id):
-    return dict()
+def create():
+    form = ''
+    return render_template(
+        'people_authentications/create.html',
+        form=form
+    )
 
 
-def update(person_id, id):
-    return dict()
+def update(id):
+    person = container.authorization.person
+    authentication = person.authentications.filter_by(id=id).first()
+
+    if not authentication:
+        abort(404)
+
+    form = ''
+    return render_template(
+        'people_authentications/update.html',
+        authentication=authentication,
+        form=form
+    )
 
 
-def delete(person_id, id):
-    return dict()
+def delete(id):
+
+    person = container.authorization.person
+    authentication = person.authentications.filter_by(id=id).first()
+    if not authentication:
+        abort(404)
+
+    return redirect(url_for('.index'))
 
 
 people_authentications.add_url_rule(
     '/authentications', 'index',
-    s(auth_manager, index, render('people_authentications/index.html')),
+    s(auth_manager, index),
     methods=['GET']
 )
 
 people_authentications.add_url_rule(
     '/<int:person_id>/authentications/new', 'new',
-    s(create, render('people_authentications/create.html')),
+    s(create),
     methods=['GET', 'POST']
 )
 
 people_authentications.add_url_rule(
     '/<int:person_id>/authentications/<int:id>/edit', 'edit',
-    s(update, render('people_authentications/update.html')),
+    s(update),
     methods=['GET', 'POST']
 )
 
 people_authentications.add_url_rule(
     '/<int:person_id>/authentications/<int:id>/delete',
     'delete',
-    s(delete, render('people_authentications/delete.html')),
+    s(delete),
     methods=['GET', 'POST']
 )

@@ -39,7 +39,7 @@ people.add_url_rule(
 
 people.add_url_rule(
     '/<int:id>/edit', 'edit',
-    s(auth_manager, update),
+    s(update),
     methods=['GET', 'POST']
 )
 

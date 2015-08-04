@@ -2,8 +2,9 @@
 
 from flask import Blueprint, request
 from ...container import container
+from .middlewares import (s, validate)
 from ...middlewares import (
-    s, auth_owner, validate
+    auth_owner
 )
 from .view_models import PublicAccount, Account as AccountViewModel
 

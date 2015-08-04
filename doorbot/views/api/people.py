@@ -1,7 +1,6 @@
 from flask import Blueprint, request
-from ...middlewares import (
-    s, auth_manager, validate
-)
+from ...middlewares import auth_manager
+from .middlewares import (s, validate)
 from ...container import container
 from ...models import PeopleSynchronization
 from ...jobs import SynchronizePeopleJob

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, request
-from ...middlewares import(
-    s, auth_manager, validate
-)
+from ...middlewares import auth_manager
+from .middlewares import (s, validate)
 from ...models import Door
 from ...container import container
 from .view_models import Door as DoorViewModel

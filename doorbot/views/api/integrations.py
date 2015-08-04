@@ -2,7 +2,8 @@
 
 from flask import Blueprint, request
 from ...container import container
-from ...middlewares import (s, validate, auth_manager)
+from ...middlewares import auth_manager
+from .middlewares import (s, validate)
 from .view_models import Integration as IntegrationViewModel
 from ...models import Integration
 

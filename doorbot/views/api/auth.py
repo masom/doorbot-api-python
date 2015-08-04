@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from ...container import container
 from ...security.policies import get_policy_for_person
-from ...middlewares import (m, account_scope, validate)
+from ...middlewares import account_scope
+from .middlewares import (m, validate)
 from ...auth import AUTHORIZATION_DEVICE, AUTHORIZATION_PERSON
 from .view_models import Person as PersonViewModel
 

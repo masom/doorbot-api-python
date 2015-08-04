@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, request
-from ...middlewares import(
+from .middlewares import(
     s, validate
 )
 from ...container import container

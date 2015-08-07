@@ -6,7 +6,7 @@ from ...models import PeopleSynchronization
 from ...jobs import SynchronizePeopleJob
 from .view_models import PublicPerson, Person as PersonViewModel
 
-people = Blueprint('people', __name__, url_prefix='/api/people')
+people = Blueprint('people', __name__, url_prefix='/people')
 
 
 def index():

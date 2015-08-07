@@ -6,7 +6,7 @@ from .middlewares import (m, validate)
 from ...auth import AUTHORIZATION_DEVICE, AUTHORIZATION_PERSON
 from .view_models import Person as PersonViewModel
 
-auth = Blueprint('auth', __name__, url_prefix='/api/auth')
+auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 def password():

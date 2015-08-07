@@ -13,7 +13,7 @@ from ...jobs import DeliverNotificationJob
 logger = get_logger()
 
 notifications = Blueprint(
-    'notifications', __name__, url_prefix='/api/notifications'
+    'notifications', __name__, url_prefix='/notifications'
 )
 
 

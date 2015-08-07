@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template
-from ...middlewars import auth_manager
-from .middlewares.dashboard import s
+from ...middlewares import auth_manager
+from .middlewares import s
 
 from ...container import container
 
-account = Blueprint('account', __name__, url_prefix='account')
+account = Blueprint('account', __name__, url_prefix='/account')
 
 
 def view():

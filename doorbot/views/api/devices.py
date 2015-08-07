@@ -8,7 +8,7 @@ from .view_models import Device as DeviceViewModel
 
 logger = get_logger()
 
-devices = Blueprint('devices', __name__, url_prefix='/api/devices')
+devices = Blueprint('devices', __name__, url_prefix='/devices')
 
 
 def index():

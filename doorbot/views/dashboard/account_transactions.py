@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, render_template
 from ...middlewares import auth_manager
-from .middlewars import s
+from .middlewares import s
 from ...container import container
 
 
@@ -11,7 +11,10 @@ account_transactions = Blueprint(
 
 def index():
     account = container.account
-    return dict(transactions=account.transactions.all())
+    return render_template(
+        'account_transactions/index.html',
+        transactions=account.transactions.all()
+    )
 
 
 def view(id):
@@ -29,7 +32,7 @@ def view(id):
 
 account_transactions.add_url_rule(
     '', 'index',
-    s(auth_manager, index, render_template('account_transactions/view.html')),
+    s(auth_manager, index),
     methods=['GET']
 )
 

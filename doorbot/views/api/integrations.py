@@ -8,7 +8,7 @@ from .view_models import Integration as IntegrationViewModel
 from ...models import Integration
 
 integrations = Blueprint(
-    'integrations', __name__, url_prefix='/api/integrations'
+    'integrations', __name__, url_prefix='/integrations'
 )
 
 

@@ -8,7 +8,7 @@ from ...middlewares import (
 )
 from .view_models import PublicAccount, Account as AccountViewModel
 
-account = Blueprint('account', __name__, url_prefix='/api/account')
+account = Blueprint('account', __name__, url_prefix='/account')
 
 
 def view():

@@ -9,7 +9,7 @@ from .view_models import Door as DoorViewModel
 
 
 doors = Blueprint(
-    'doors', __name__, url_prefix='/api/doors'
+    'doors', __name__, url_prefix='/doors'
 )
 
 

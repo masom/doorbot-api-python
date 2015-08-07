@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from ...middlewares import (account_scope, auth_secured, _logger_context)
+from flask import redirect, url_for
+from ....middlewares import (account_scope, auth_secured, _logger_context)
 
 
 def s(*mw):
@@ -18,6 +19,9 @@ def m(*mw):
         for item in mw:
             rv = item(*args, **kwargs)
             if rv:
+                if isinstance(rv, tuple):
+                    if rv[1] == 401:
+                        return redirect(url_for('auth.login'))
                 return rv
 
     return wrapped

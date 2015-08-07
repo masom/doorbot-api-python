@@ -54,7 +54,15 @@ class SubdomainDispatcher(object):
 
         # Save the parsed subdomain to DOORBOT_ACCOUNT_HOST
         environ['DOORBOT_ACCOUNT_HOST'] = parts[0]
-        return self.apps['api']
+
+        # Check for API
+        path = environ.get('PATH_INFO', '')
+        if path.startswith('/api'):
+            # Strip the beginning of the path to match the app routing.
+            environ['PATH_INFO'] = path.rsplit('/', 1)[1]
+            return self.apps['api']
+
+        return self.apps['dashboard']
 
     def __call__(self, environ, start_response):
         app = self.get_application(environ)
@@ -77,6 +85,25 @@ def create_admin_app(config=None):
 
     app.register_blueprint(accounts)
     app.session_interface = ItsdangerousSessionInterface()
+
+    return app
+
+
+def create_dashboard_app(config=None):
+    app = Flask(__name__)
+    if config:
+        app.config.from_pyfile(config)
+
+    app.url_map.strict_slashes = False
+
+    db.init_app(app)
+
+    from .container import container
+    container.init_app(app)
+
+    from .views.dashboard import blueprints
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     return app
 

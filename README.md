@@ -4,6 +4,14 @@ This is a work in progress of a python API for doorbot.
 
 There is a "full" go implementation at [masom/doorbot](https://github.com/masom/doorbot)
 
+### Multiple Flask apps
+Doorbot mounts several applications on Werkzeug:
+- Accounts on subdomains which includes a "dashboard" and an "API" app
+- Admin subdomain
+- Main website
+
+This is accomplished using the Flask app factory pattern. https://github.com/masom/doorbot-api-python/blob/master/doorbot/factory.py
+
 ### Middlewares
 This project experimented a little bit with route middlewares.
 

@@ -4,6 +4,12 @@ This is a work in progress of a python API for doorbot.
 
 There is a "full" go implementation at [masom/doorbot](https://github.com/masom/doorbot)
 
+Some portions of the code are outright horrible. Notably:
+- There are no tests.
+- The context object. This was an experiment on using a specific object vs the magical `g`.
+- The celery tasks were implemented like Rails's ActiveJobs and it did not translate properly.
+- The services classes should be refactored into specific "operations". Each operation should be a distinct class instead of being grouped into a massive service.
+
 ### Multiple Flask apps
 Doorbot mounts several applications on Werkzeug:
 - Accounts on subdomains which includes a "dashboard" and an "API" app

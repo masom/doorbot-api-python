@@ -2,7 +2,7 @@
 
 This is a work in progress of a python API for doorbot.
 
-There is a "full" go implementation at (masom/doorbot)[https://github.com/masom/doorbot]
+There is a "full" go implementation at [masom/doorbot](https://github.com/masom/doorbot)
 
 ### Middlewares
 This project experimented a little bit with route middlewares.
